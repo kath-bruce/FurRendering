@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fur_Rendering", "Fur_Rendering\Fur_Rendering.vcxproj", "{75647756-D0B2-44FA-86EB-FADD4F7928E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Debug|x64.ActiveCfg = Debug|x64
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Debug|x64.Build.0 = Debug|x64
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Debug|x86.ActiveCfg = Debug|Win32
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Debug|x86.Build.0 = Debug|Win32
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Release|x64.ActiveCfg = Release|x64
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Release|x64.Build.0 = Release|x64
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Release|x86.ActiveCfg = Release|Win32
+		{75647756-D0B2-44FA-86EB-FADD4F7928E6}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C96AEB70-E691-4D78-A050-60A4F419F891}
+	EndGlobalSection
+EndGlobal
