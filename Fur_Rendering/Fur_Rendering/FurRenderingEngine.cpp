@@ -28,7 +28,7 @@ namespace FurRenderingEngine {
 
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)screenWidth / (float)screenHeight, 1.0f, 150.0f);
 
-	GLuint loadBitmap(char * fname)
+	GLuint loadBitmap(const char * fname)
 	{
 		GLuint texID;
 		glGenTextures(1, &texID); // generate texture ID
@@ -67,7 +67,7 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
-	void addModel(char * modelFileName, char * textureFileName, glm::vec3 pos, glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName)
+	void addModel(const char * modelFileName, const char * textureFileName, glm::vec3 pos, glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName)
 	{
 		if (shaders.count(shaderName) < 1)
 		{
@@ -98,6 +98,8 @@ namespace FurRenderingEngine {
 	{
 		GLuint shaderProgram = rt3d::initShaders(vert, frag);
 		shaders.insert({ shaderName, shaderProgram });
+
+		//addModel("cube.obj", "fur.bmp", glm::vec3(1.0f, 0.0f, -3.0f), glm::vec3(10.0f, 10.0f, 0.1f), 0.0f, shaderName, shaderName);
 	}
 
 	void setLight(std::string shaderName, rt3d::lightStruct light)
@@ -168,7 +170,7 @@ namespace FurRenderingEngine {
 		//for each model in models vector - draw
 
 		glEnable(GL_CULL_FACE);
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 modelview(1.0); // set base position for scene
@@ -177,6 +179,7 @@ namespace FurRenderingEngine {
 		at = moveForward(eye, 0.0f, 1.0f);
 		mvStack.top() = glm::lookAt(eye, at, up);
 
+		
 		for (auto m : models)
 		{
 			glUseProgram(m.getShaderProgram());

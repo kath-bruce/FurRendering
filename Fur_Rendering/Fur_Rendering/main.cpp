@@ -5,6 +5,11 @@
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
+//GLuint shader;
+//GLuint text;
+//GLuint mesh;
+//GLuint meshIC;
+
 // Set up rendering context
 SDL_Window * setupRC(SDL_GLContext &context) {
 	SDL_Window * window;
@@ -49,9 +54,11 @@ void init()
 	//shaders
 	std::string furPlane = "furPlane";
 	FurRenderingEngine::addShader(furPlane, "textured.vert", "textured.frag");
-	//FurRenderingEngine::setLight(furPlane, light);
+
 	//models
-	FurRenderingEngine::addModel("cube.obj", "fur.bmp", glm::vec3(1.0f, 0.0f, -3.0f), glm::vec3(10.0f, 10.0f, 0.1f), 0.0f, furPlane, furPlane);
+	FurRenderingEngine::addModel("cube.obj", "fur.bmp", glm::vec3(0.0f, 1.0f, -3.0f), 
+		glm::vec3(1.0f, 1.0f, 0.1f), 20.0f, furPlane, furPlane);
+	
 }
 
 void update()

@@ -15,10 +15,10 @@ namespace FurRenderingEngine {
 
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
-	//GLuint loadBitmap(char * fname);
 
 	void addModel(const char * modelFileName, const char * textureFileName, glm::vec3 pos,
 		glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName);
+
 
 	//set light
 	void setLight(std::string shaderName, rt3d::lightStruct light);
@@ -26,7 +26,6 @@ namespace FurRenderingEngine {
 	//set material
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
 
-	//not too sure if this will work
 	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda); 
 
 
