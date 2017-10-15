@@ -8,8 +8,7 @@ namespace FurRenderingEngine {
 	std::unordered_map<std::string, GLuint> shaders;
 
 	//models
-	//std::unordered_map<std::string, Model> models;
-	std::vector<Model> models;
+	std::unordered_map<std::string, Model> models;
 
 	//mvstack
 	std::stack<glm::mat4> mvStack;
@@ -23,10 +22,7 @@ namespace FurRenderingEngine {
 
 	//projection
 
-	GLuint screenHeight = 600;
-	GLuint screenWidth = 800;
-
-	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)screenWidth / (float)screenHeight, 1.0f, 150.0f);
+	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
 
 	GLuint loadBitmap(const char * fname)
 	{
@@ -88,9 +84,7 @@ namespace FurRenderingEngine {
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
 		GLuint texture = loadBitmap(textureFileName);
 
-
-		//models.insert({ modelName, Model(modelObj, texture, pos, scale, r, meshIndexCount, shaderProgram) });
-		models.push_back(Model(modelObj, texture, pos, scale, r, meshIndexCount, shaderProgram));
+		models.emplace(std::make_pair( modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram) ));
 
 	}
 
@@ -99,7 +93,6 @@ namespace FurRenderingEngine {
 		GLuint shaderProgram = rt3d::initShaders(vert, frag);
 		shaders.insert({ shaderName, shaderProgram });
 
-		//addModel("cube.obj", "fur.bmp", glm::vec3(1.0f, 0.0f, -3.0f), glm::vec3(10.0f, 10.0f, 0.1f), 0.0f, shaderName, shaderName);
 	}
 
 	void setLight(std::string shaderName, rt3d::lightStruct light)
@@ -139,22 +132,23 @@ namespace FurRenderingEngine {
 		lambda(shaderProgram);
 	}
 
-	
-
-	/*void updateModelPosScaleRot(std::string modelName, glm::vec3 pos, glm::vec3 scale, GLfloat rot)
+	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
+
 		if (models.count(modelName) < 1)
 		{
 			std::cout << "ERROR (updateModelPosScaleRot): " << modelName << " has not been initialised!\n";
 			return;
 		}
 
-		Model m = models[modelName];
+		Model m = models.at(modelName);
 
-		m.setPos(pos);
-		m.setScale(scale);
-		m.setRot(rot);
-	}*/
+		m.setRotX(m.getRotX() + rotX);
+		m.setRotY(m.getRotY() + rotY);
+		m.setRotZ(m.getRotZ() + rotZ);
+
+		models.insert_or_assign(modelName, m);
+	}
 
 
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
@@ -179,8 +173,8 @@ namespace FurRenderingEngine {
 		at = moveForward(eye, 0.0f, 1.0f);
 		mvStack.top() = glm::lookAt(eye, at, up);
 
-		
-		for (auto m : models)
+
+		/*for (auto m : models)
 		{
 			glUseProgram(m.getShaderProgram());
 			rt3d::setUniformMatrix4fv(m.getShaderProgram(), "projection", glm::value_ptr(projection));
@@ -192,7 +186,7 @@ namespace FurRenderingEngine {
 			mvStack.top() = glm::translate(mvStack.top(), m.getPos());
 
 			mvStack.top() = glm::rotate(mvStack.top(), float(m.getRot() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f));
-			
+
 			mvStack.top() = glm::scale(mvStack.top(), m.getScale());
 
 			rt3d::setUniformMatrix4fv(m.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
@@ -200,9 +194,9 @@ namespace FurRenderingEngine {
 			rt3d::drawIndexedMesh(m.getModel(), m.getMeshIndexCount(), GL_TRIANGLES);
 
 			mvStack.pop();
-		}
+		}*/
 
-		/*for (auto m : models)
+		for (auto m : models)
 		{
 			glUseProgram(m.second.getShaderProgram());
 			rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
@@ -213,7 +207,9 @@ namespace FurRenderingEngine {
 
 			mvStack.top() = glm::translate(mvStack.top(), m.second.getPos());
 
-			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRot() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f));
+			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotX() * DEG_TO_RADIAN), glm::vec3(1.0f, 0.0f, 0.0f));
+			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotY() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f)); 
+			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotZ() * DEG_TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
 
 			mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
 
@@ -222,7 +218,7 @@ namespace FurRenderingEngine {
 			rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
 
 			mvStack.pop();
-		}*/
+		}
 
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix

@@ -5,10 +5,7 @@
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
-//GLuint shader;
-//GLuint text;
-//GLuint mesh;
-//GLuint meshIC;
+#define FUR_PLANE "furPlane"
 
 // Set up rendering context
 SDL_Window * setupRC(SDL_GLContext &context) {
@@ -29,7 +26,7 @@ SDL_Window * setupRC(SDL_GLContext &context) {
 
 													   // Create 800x600 window
 	window = SDL_CreateWindow("SDL/GLM/OpenGL Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+		SCREENWIDTH, SCREENHEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
 	if (!window) // Check window was created OK
 		rt3d::exitFatalError("Unable to create window");
 
@@ -44,25 +41,44 @@ void init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	rt3d::lightStruct light = {
-		{ 0.3f, 0.3f, 0.3f, 1.0f }, // ambient
-		{ 1.0f, 1.0f, 1.0f, 1.0f }, // diffuse
-		{ 1.0f, 1.0f, 1.0f, 1.0f }, // specular
-		{ -10.0f, 10.0f, 10.0f, 1.0f }  // position
-	};
-
 	//shaders
-	std::string furPlane = "furPlane";
-	FurRenderingEngine::addShader(furPlane, "textured.vert", "textured.frag");
+	FurRenderingEngine::addShader(FUR_PLANE, "textured.vert", "textured.frag");
 
 	//models
 	FurRenderingEngine::addModel("cube.obj", "fur.bmp", glm::vec3(0.0f, 1.0f, -3.0f), 
-		glm::vec3(1.0f, 1.0f, 0.1f), 20.0f, furPlane, furPlane);
+		glm::vec3(1.0f, 1.0f, 0.01f), 20.0f, FUR_PLANE, FUR_PLANE);
+	
 	
 }
 
-void update()
+void update(SDL_Event sdlEvent)
 {
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
+
+	if (keys[SDL_SCANCODE_COMMA])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 1.5f, 0.0f);
+	}
+	if (keys[SDL_SCANCODE_PERIOD])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, -1.5f, 0.0f);
+	}
+	if (keys[SDL_SCANCODE_UP])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, 1.5f, 0.0f, 0.0f);
+	}
+	if (keys[SDL_SCANCODE_DOWN])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, -1.5f, 0.0f, 0.0f);
+	}
+	if (keys[SDL_SCANCODE_LEFT])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 0.0f, 1.5f);
+	}
+	if (keys[SDL_SCANCODE_RIGHT])
+	{
+		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 0.0f, -1.5f);
+	}
 
 }
 
@@ -89,9 +105,10 @@ int main(int argc, char *argv[])
 		while (SDL_PollEvent(&sdlEvent)) {
 			if (sdlEvent.type == SDL_QUIT || sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 				running = false;
+
 		}
 
-		update();
+		update(sdlEvent);
 
 		FurRenderingEngine::draw();
 		SDL_GL_SwapWindow(window); // swap buffers

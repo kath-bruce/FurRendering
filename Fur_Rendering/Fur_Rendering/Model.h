@@ -11,12 +11,14 @@ private:
 	GLuint texture;
 	glm::vec3 pos;
 	glm::vec3 scale;
-	GLfloat rot;
+	GLfloat rotX;
+	GLfloat rotY;
+	GLfloat rotZ;
 	GLuint meshIndexCount;
 	GLuint shaderProgram;
 
 public:
-	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLfloat r, GLuint mIC, GLuint sP);
+	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
 
 	GLuint getModel() { return model; }
 	GLuint getTexture() { return texture; }
@@ -27,8 +29,14 @@ public:
 	glm::vec3 getScale() { return scale; }
 	void setScale(glm::vec3 newScale) { scale = newScale; }
 
-	GLfloat getRot() { return rot; }
-	void setRot(GLfloat newRot) { rot = newRot; }
+	GLfloat getRotX() { return rotX; }
+	void setRotX(GLfloat newRotX) { rotX = newRotX; }
+
+	GLfloat getRotY() { return rotY; }
+	void setRotY(GLfloat newRotY) { rotY = newRotY; }
+
+	GLfloat getRotZ() { return rotZ; }
+	void setRotZ(GLfloat newRotZ) { rotZ = newRotZ; }
 
 	GLuint getMeshIndexCount() { return meshIndexCount; }
 	GLuint getShaderProgram() { return shaderProgram; }
