@@ -14,6 +14,7 @@ namespace FurRenderingEngine {
 	#define DEG_TO_RADIAN 0.017453293
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
+	#define FUR_TEXTURE_DIMENSION 512
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 

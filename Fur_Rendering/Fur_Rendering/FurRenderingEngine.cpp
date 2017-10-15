@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <time.h>
 namespace FurRenderingEngine {
 	//shader
 	std::unordered_map<std::string, GLuint> shaders;
@@ -23,6 +24,54 @@ namespace FurRenderingEngine {
 	//projection
 
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
+
+	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
+
+	GLuint generateTexture()
+	{
+		GLuint texID;
+		glGenTextures(1, &texID);
+
+		// bind texture and set parameters
+		glBindTexture(GL_TEXTURE_2D, texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		srand(time(NULL));
+
+		for (int i = 0; i < FUR_TEXTURE_DIMENSION; i++)
+		{
+			for (int j = 0; j < FUR_TEXTURE_DIMENSION; j++)
+			{
+				int furChance = rand() % 100 + 1;
+
+				if (furChance > 50) {
+					furTexture[i][j][0] = (GLubyte)0;		//r
+					furTexture[i][j][1] = (GLubyte)0;		//g
+					furTexture[i][j][2] = (GLubyte)0;		//b
+				}
+				else
+				{
+					furTexture[i][j][0] = (GLubyte)255;		//r
+					furTexture[i][j][1] = (GLubyte)255;		//g
+					furTexture[i][j][2] = (GLubyte)255;		//b
+				}
+
+
+				furTexture[i][j][3] = (GLubyte)255;		//a
+			}
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FUR_TEXTURE_DIMENSION, 
+			FUR_TEXTURE_DIMENSION, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			furTexture);
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		return texID;	// return value of texture ID
+	}
 
 	GLuint loadBitmap(const char * fname)
 	{
@@ -73,6 +122,8 @@ namespace FurRenderingEngine {
 
 		GLuint shaderProgram = shaders[shaderName];
 
+		//todo: check if model or texture has already been loaded?
+
 		std::vector<GLfloat> verts;
 		std::vector<GLfloat> norms;
 		std::vector<GLfloat> tex_coords;
@@ -81,8 +132,10 @@ namespace FurRenderingEngine {
 		rt3d::loadObj(modelFileName, verts, norms, tex_coords, indices);
 
 		GLuint meshIndexCount = indices.size();
+
+		//todo: error checking i.e., if tex_coords.size() < 0 pass nullptr instead
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
-		GLuint texture = loadBitmap(textureFileName);
+		GLuint texture = generateTexture();//loadBitmap(textureFileName);
 
 		models.emplace(std::make_pair( modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram) ));
 
@@ -149,7 +202,6 @@ namespace FurRenderingEngine {
 
 		models.insert_or_assign(modelName, m);
 	}
-
 
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
 		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
