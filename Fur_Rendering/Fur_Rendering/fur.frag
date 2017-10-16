@@ -8,6 +8,7 @@ uniform sampler2D textureUnit0;
 
 in vec2 ex_TexCoord;
 in float ex_fragLayer;
+//in vec3 ex_Normal;
 
 layout(location = 0) out vec4 out_Color;
  
@@ -20,6 +21,9 @@ void main(void) {
 	vec4 furColour = vec4(1.0, 0.0, 0.0, 1.0) * fakeShadow;
 
 	float visibility = (ex_fragLayer > (furData.r*20)) ? 0.0 : furData.a;
+
+	visibility = visibility - (ex_fragLayer/100.0);
+
 	furColour.a = visibility; //(ex_fragLayer == 0.0) ? 0.0 : visibility;
 
 	out_Color = furColour;

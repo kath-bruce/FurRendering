@@ -22,7 +22,7 @@ namespace FurRenderingEngine {
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
-		glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName);
+		glm::vec3 scale, std::string modelName, std::string shaderName);
 
 	//set light
 	void setLight(std::string shaderName, rt3d::lightStruct light);

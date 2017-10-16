@@ -46,17 +46,20 @@ void init()
 
 	FurRenderingEngine::setUniform(FUR_PLANE, [](GLuint shader)
 	{
-		glm::vec3 temp(0.0, -0.001, 0.05);
+		glm::vec3 temp(0.0125, 0.0125, 0.0125); //space in between shells
 
 		int uniformIndex = glGetUniformLocation(shader, "displacement");
 		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
 	}
 	);
 
+
 	//models
-	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -3.0f), 
-		glm::vec3(1.0f, 1.0f, 0.01f), 20.0f, FUR_PLANE, FUR_PLANE);
+	/*FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -3.0f), 
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_PLANE, FUR_PLANE);*/
 	
+	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_PLANE, FUR_PLANE);
 	
 }
 

@@ -47,7 +47,7 @@ namespace FurRenderingEngine {
 			{
 				int furChance = rand() % 100 + 1;
 
-				if (furChance > 25) {
+				if (furChance > 45) {
 					furTexture[i][j][0] = (GLubyte)0;		//r
 					furTexture[i][j][1] = (GLubyte)0;		//g
 					furTexture[i][j][2] = (GLubyte)0;		//b
@@ -112,7 +112,7 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
-	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName)
+	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
 	{
 		if (shaders.count(shaderName) < 1)
 		{
@@ -231,7 +231,7 @@ namespace FurRenderingEngine {
 	{
 		//for each model in models vector - draw
 
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 		glClearColor(0.0f, 0.75f, 0.75f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -241,7 +241,7 @@ namespace FurRenderingEngine {
 		at = moveForward(eye, 0.0f, 1.0f);
 		mvStack.top() = glm::lookAt(eye, at, up);
 
-		//glCullFace(GL_FRONT_AND_BACK);
+		//glCullFace(GL_BACK);
 
 		for (auto m : models)
 		{
