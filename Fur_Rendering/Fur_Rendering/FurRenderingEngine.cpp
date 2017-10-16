@@ -47,7 +47,7 @@ namespace FurRenderingEngine {
 			{
 				int furChance = rand() % 100 + 1;
 
-				if (furChance > 50) {
+				if (furChance > 25) {
 					furTexture[i][j][0] = (GLubyte)0;		//r
 					furTexture[i][j][1] = (GLubyte)0;		//g
 					furTexture[i][j][2] = (GLubyte)0;		//b
@@ -112,7 +112,7 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
-	void addModel(const char * modelFileName, const char * textureFileName, glm::vec3 pos, glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName)
+	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName)
 	{
 		if (shaders.count(shaderName) < 1)
 		{
@@ -135,10 +135,26 @@ namespace FurRenderingEngine {
 
 		//todo: error checking i.e., if tex_coords.size() < 0 pass nullptr instead
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
-		GLuint texture = generateTexture();//loadBitmap(textureFileName);
+		GLuint texture = generateTexture();
 
 		models.emplace(std::make_pair( modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram) ));
 
+	}
+
+	void regenTexture(std::string modelName)
+	{
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (updateModelPosScaleRot): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+		GLuint text = generateTexture();
+
+		m.setTexture(text);
+
+		models.insert_or_assign(modelName, m);
 	}
 
 	void addShader(std::string shaderName, const char * vert, const char * frag)
@@ -216,7 +232,7 @@ namespace FurRenderingEngine {
 		//for each model in models vector - draw
 
 		glEnable(GL_CULL_FACE);
-		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(0.0f, 0.75f, 0.75f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 modelview(1.0); // set base position for scene
@@ -225,51 +241,36 @@ namespace FurRenderingEngine {
 		at = moveForward(eye, 0.0f, 1.0f);
 		mvStack.top() = glm::lookAt(eye, at, up);
 
-
-		/*for (auto m : models)
-		{
-			glUseProgram(m.getShaderProgram());
-			rt3d::setUniformMatrix4fv(m.getShaderProgram(), "projection", glm::value_ptr(projection));
-
-			glBindTexture(GL_TEXTURE_2D, m.getTexture());
-
-			mvStack.push(mvStack.top());
-
-			mvStack.top() = glm::translate(mvStack.top(), m.getPos());
-
-			mvStack.top() = glm::rotate(mvStack.top(), float(m.getRot() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f));
-
-			mvStack.top() = glm::scale(mvStack.top(), m.getScale());
-
-			rt3d::setUniformMatrix4fv(m.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
-
-			rt3d::drawIndexedMesh(m.getModel(), m.getMeshIndexCount(), GL_TRIANGLES);
-
-			mvStack.pop();
-		}*/
+		//glCullFace(GL_FRONT_AND_BACK);
 
 		for (auto m : models)
 		{
-			glUseProgram(m.second.getShaderProgram());
-			rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
+			for (int i = 0; i < FUR_LAYERS; i++)
+			{
+				glUseProgram(m.second.getShaderProgram());
+				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
 
-			glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
+				int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
+				glUniform1f(uniformIndex, i);
 
-			mvStack.push(mvStack.top());
+				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
-			mvStack.top() = glm::translate(mvStack.top(), m.second.getPos());
+				mvStack.push(mvStack.top());
 
-			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotX() * DEG_TO_RADIAN), glm::vec3(1.0f, 0.0f, 0.0f));
-			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotY() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f)); 
-			mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotZ() * DEG_TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
+				mvStack.top() = glm::translate(mvStack.top(), m.second.getPos());
 
-			mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
+				mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotX() * DEG_TO_RADIAN), glm::vec3(1.0f, 0.0f, 0.0f));
+				mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotY() * DEG_TO_RADIAN), glm::vec3(0.0f, 1.0f, 0.0f));
+				mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotZ() * DEG_TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
 
-			rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
+				mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
 
-			rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
+				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
 
-			mvStack.pop();
+				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
+
+				mvStack.pop();
+			}
 		}
 
 		// remember to use at least one pop operation per push...

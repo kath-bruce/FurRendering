@@ -46,16 +46,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="textured.frag">
+    <None Include="fur.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="textured.vert">
+    <None Include="fur.vert">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="fur.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

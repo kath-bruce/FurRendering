@@ -155,11 +155,8 @@
     <ClInclude Include="rt3dObjLoader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="textured.frag" />
-    <None Include="textured.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="fur.bmp" />
+    <None Include="fur.frag" />
+    <None Include="fur.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,10 +15,13 @@ namespace FurRenderingEngine {
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
 	#define FUR_TEXTURE_DIMENSION 512
+	#define FUR_LAYERS 80
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
-	void addModel(const char * modelFileName, const char * textureFileName, glm::vec3 pos,
+	void regenTexture(std::string modelName);
+
+	void addModel(const char * modelFileName, glm::vec3 pos,
 		glm::vec3 scale, GLfloat r, std::string modelName, std::string shaderName);
 
 	//set light

@@ -21,7 +21,9 @@ public:
 	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
 
 	GLuint getModel() { return model; }
+
 	GLuint getTexture() { return texture; }
+	void setTexture(GLuint t) { texture = t; }
 
 	glm::vec3 getPos() { return pos; }
 	void setPos(glm::vec3 newPos) { pos = newPos; }

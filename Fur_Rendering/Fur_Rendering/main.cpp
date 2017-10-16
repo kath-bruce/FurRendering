@@ -42,10 +42,19 @@ void init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//shaders
-	FurRenderingEngine::addShader(FUR_PLANE, "textured.vert", "textured.frag");
+	FurRenderingEngine::addShader(FUR_PLANE, "fur.vert", "fur.frag");
+
+	FurRenderingEngine::setUniform(FUR_PLANE, [](GLuint shader)
+	{
+		glm::vec3 temp(0.0, -0.001, 0.05);
+
+		int uniformIndex = glGetUniformLocation(shader, "displacement");
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+	}
+	);
 
 	//models
-	FurRenderingEngine::addModel("cube.obj", "fur.bmp", glm::vec3(0.0f, 1.0f, -3.0f), 
+	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -3.0f), 
 		glm::vec3(1.0f, 1.0f, 0.01f), 20.0f, FUR_PLANE, FUR_PLANE);
 	
 	
@@ -78,6 +87,10 @@ void update(SDL_Event sdlEvent)
 	if (keys[SDL_SCANCODE_RIGHT])
 	{
 		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 0.0f, -1.5f);
+	}
+	if (keys[SDL_SCANCODE_R])
+	{
+		FurRenderingEngine::regenTexture(FUR_PLANE);
 	}
 
 }
