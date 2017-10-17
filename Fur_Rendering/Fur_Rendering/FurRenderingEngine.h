@@ -36,5 +36,7 @@ namespace FurRenderingEngine {
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
 
 	void draw();
+
+	//void setGravity(glm::vec3 newGravity);
 }
 

@@ -25,6 +25,8 @@ namespace FurRenderingEngine {
 
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
 
+	//glm::vec3 gravity;
+
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
 
 	GLuint generateTexture()
@@ -47,7 +49,7 @@ namespace FurRenderingEngine {
 			{
 				int furChance = rand() % 100 + 1;
 
-				if (furChance > 45) {
+				if (furChance > 75) {
 					furTexture[i][j][0] = (GLubyte)0;		//r
 					furTexture[i][j][1] = (GLubyte)0;		//g
 					furTexture[i][j][2] = (GLubyte)0;		//b
@@ -112,6 +114,11 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
+	/*void setGravity(glm::vec3 newGravity)
+	{
+		gravity = newGravity;
+	}*/
+
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
 	{
 		if (shaders.count(shaderName) < 1)
@@ -133,7 +140,7 @@ namespace FurRenderingEngine {
 
 		GLuint meshIndexCount = indices.size();
 
-		//todo: error checking i.e., if tex_coords.size() < 0 pass nullptr instead
+		//todo: error checking i.e., if tex_coords.size() < 0 pass nullptr instead?
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
 		GLuint texture = generateTexture();
 
@@ -206,7 +213,7 @@ namespace FurRenderingEngine {
 
 		if (models.count(modelName) < 1)
 		{
-			std::cout << "ERROR (updateModelPosScaleRot): " << modelName << " has not been initialised!\n";
+			std::cout << "ERROR (updateModelRot): " << modelName << " has not been initialised!\n";
 			return;
 		}
 
@@ -217,6 +224,10 @@ namespace FurRenderingEngine {
 		m.setRotZ(m.getRotZ() + rotZ);
 
 		models.insert_or_assign(modelName, m);
+
+		/*
+		int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
+		glUniform1f(uniformIndex, i);*/
 	}
 
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {

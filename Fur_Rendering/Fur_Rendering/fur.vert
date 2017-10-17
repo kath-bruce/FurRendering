@@ -9,6 +9,10 @@ uniform vec3 displacement;
 
 uniform float layer;
 
+uniform vec3 gravity;
+
+uniform vec4 fur_colour;
+
 in  vec3 in_Position;
 in  vec3 in_Normal;
 
@@ -18,11 +22,17 @@ out vec2 ex_TexCoord;
 
 out float ex_fragLayer;
 
+out vec4 ex_furColour;
 
 // multiply each vertex position by the MVP matrix
 void main(void) {
 
 	vec3 shell = in_Position.xyz + ((in_Normal.xyz * layer)*displacement);
+	
+	float k = pow(layer/25,2);
+
+	shell = shell + (gravity*k);
+
 	vec4 newPos = vec4(shell, 1.0);
 
 	gl_Position = (projection * modelview * newPos);
@@ -30,5 +40,7 @@ void main(void) {
 	ex_TexCoord = in_TexCoord;
 
 	ex_fragLayer = layer;
+
+	ex_furColour = fur_colour;
 
 }

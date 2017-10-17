@@ -5,7 +5,7 @@
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
-#define FUR_PLANE "furPlane"
+#define FUR_OBJ "furObj"
 
 // Set up rendering context
 SDL_Window * setupRC(SDL_GLContext &context) {
@@ -42,9 +42,9 @@ void init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//shaders
-	FurRenderingEngine::addShader(FUR_PLANE, "fur.vert", "fur.frag");
+	FurRenderingEngine::addShader(FUR_OBJ, "fur.vert", "fur.frag");
 
-	FurRenderingEngine::setUniform(FUR_PLANE, [](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
 	{
 		glm::vec3 temp(0.0125, 0.0125, 0.0125); //space in between shells
 
@@ -52,15 +52,40 @@ void init()
 		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
 	}
 	);
+	//dot product! - between normal and gravity then trend towards it?
+	//use mix!
 
+	//glm::vec3 gravity(0.0, -0.8, 0.0);
+
+	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
+	{
+		glm::vec3 temp(0.0, -0.8, 0.0);
+
+		int uniformIndex = glGetUniformLocation(shader, "gravity");
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+	}
+	);
+
+	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
+	{
+		glm::vec4 temp(1.0, 0.8, 1.0, 0.0);
+
+		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
+		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
+	}
+	);
+
+	//FurRenderingEngine::setGravity(gravity);
 
 	//models
 	/*FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -3.0f), 
 		glm::vec3(0.5f, 0.5f, 0.5f), FUR_PLANE, FUR_PLANE);*/
 	
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_PLANE, FUR_PLANE);
-	
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_OBJ);
+
+	/*FurRenderingEngine::addModel("werewolf.obj", glm::vec3(0.0f, 1.0f, -3.0f),
+		glm::vec3(0.025f, 0.05f, 0.05f), FUR_PLANE, FUR_PLANE);*/
 }
 
 void update(SDL_Event sdlEvent)
@@ -69,31 +94,31 @@ void update(SDL_Event sdlEvent)
 
 	if (keys[SDL_SCANCODE_COMMA])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_PERIOD])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, -1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_UP])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, 1.5f, 0.0f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_DOWN])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, -1.5f, 0.0f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_LEFT])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 0.0f, 1.5f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
 	}
 	if (keys[SDL_SCANCODE_RIGHT])
 	{
-		FurRenderingEngine::updateModelRot(FUR_PLANE, 0.0f, 0.0f, -1.5f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
 	}
 	if (keys[SDL_SCANCODE_R])
 	{
-		FurRenderingEngine::regenTexture(FUR_PLANE);
+		FurRenderingEngine::regenTexture(FUR_OBJ);
 	}
 
 }
