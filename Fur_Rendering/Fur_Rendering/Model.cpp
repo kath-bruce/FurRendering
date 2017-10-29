@@ -13,6 +13,8 @@ Model::Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP
 	rotY = 0.0f;
 	rotZ = 0.0f;
 
+	
+
 	meshIndexCount = mIC;
 	shaderProgram = sP;
 }

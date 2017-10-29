@@ -5,7 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-//#include <SDL_ttf.h>
+//#include <chrono>
+#include <time.h>
 #include "rt3d.h"
 #include "rt3dObjLoader.h"
 #include "Model.h"
@@ -15,7 +16,7 @@ namespace FurRenderingEngine {
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
 	#define FUR_TEXTURE_DIMENSION 512
-	#define FUR_LAYERS 80
+	#define FUR_LAYERS 60
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
@@ -37,6 +38,8 @@ namespace FurRenderingEngine {
 
 	void draw();
 
-	//void setGravity(glm::vec3 newGravity);
+	void resetModelRot(std::string modelName);
+
+	void setGravity(glm::vec3 grav);
 }
 

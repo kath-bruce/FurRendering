@@ -17,6 +17,8 @@ private:
 	GLuint meshIndexCount;
 	GLuint shaderProgram;
 
+	//glm::quat rot;
+
 public:
 	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
 
@@ -29,16 +31,31 @@ public:
 	void setPos(glm::vec3 newPos) { pos = newPos; }
 
 	glm::vec3 getScale() { return scale; }
-	void setScale(glm::vec3 newScale) { scale = newScale; }
+	void setScale(glm::vec3 newScale) { scale = newScale;}
 
 	GLfloat getRotX() { return rotX; }
-	void setRotX(GLfloat newRotX) { rotX = newRotX; }
+	void setRotX(GLfloat newRotX) { rotX = newRotX; 
+		if (rotX >= 360.0f)
+		{ rotX = 0.0f; }
+		else if (rotX < 0.0f)
+		{ rotX = 360.0f; }
+	}
 
 	GLfloat getRotY() { return rotY; }
-	void setRotY(GLfloat newRotY) { rotY = newRotY; }
+	void setRotY(GLfloat newRotY) { rotY = newRotY;
+		if (rotY >= 360.0f)
+		{ rotY = 0.0f; }
+		else if (rotY < 0.0f)
+		{ rotY = 360.0f; }
+	}
 
 	GLfloat getRotZ() { return rotZ; }
-	void setRotZ(GLfloat newRotZ) { rotZ = newRotZ; }
+	void setRotZ(GLfloat newRotZ) { rotZ = newRotZ;
+		if (rotZ >= 360.0f)
+		{ rotZ = 0.0f; }
+		else if (rotZ < 0.0f)
+		{ rotZ = 360.0f; }
+	}
 
 	GLuint getMeshIndexCount() { return meshIndexCount; }
 	GLuint getShaderProgram() { return shaderProgram; }

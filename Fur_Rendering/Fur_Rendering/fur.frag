@@ -17,7 +17,7 @@ void main(void) {
     
 	// Fragment colour
 
-	float fakeShadow = mix(0.2, 0.9, (ex_fragLayer/20.0));
+	float fakeShadow = mix(0.4, 1.0, (ex_fragLayer/25.0));
 	vec4 furData = texture(textureUnit0, ex_TexCoord);
 	vec4 furColour = ex_furColour * fakeShadow;
 

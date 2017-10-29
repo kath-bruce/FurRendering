@@ -46,46 +46,38 @@ void init()
 
 	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
 	{
-		glm::vec3 temp(0.0125, 0.0125, 0.0125); //space in between shells
+		glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
 
 		int uniformIndex = glGetUniformLocation(shader, "displacement");
 		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
 	}
 	);
-	//dot product! - between normal and gravity then trend towards it?
-	//use mix!
 
-	//glm::vec3 gravity(0.0, -0.8, 0.0);
+	glm::vec3 gravity(0.0, -0.5, 0.0);
 
-	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_OBJ, [&gravity](GLuint shader)
 	{
-		glm::vec3 temp(0.0, -0.8, 0.0);
-
 		int uniformIndex = glGetUniformLocation(shader, "gravity");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
+
+		FurRenderingEngine::setGravity(gravity);
 	}
 	);
 
 	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
 	{
-		glm::vec4 temp(1.0, 0.8, 1.0, 0.0);
+		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
 
 		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
 		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
 	}
 	);
-
-	//FurRenderingEngine::setGravity(gravity);
-
-	//models
-	/*FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -3.0f), 
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_PLANE, FUR_PLANE);*/
 	
-	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
+	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
 		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_OBJ);
 
-	/*FurRenderingEngine::addModel("werewolf.obj", glm::vec3(0.0f, 1.0f, -3.0f),
-		glm::vec3(0.025f, 0.05f, 0.05f), FUR_PLANE, FUR_PLANE);*/
+	/*FurRenderingEngine::addModel("cat.obj", glm::vec3(0.0f, 1.0f, -3.0f),
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_OBJ);*/
 }
 
 void update(SDL_Event sdlEvent)
@@ -120,7 +112,10 @@ void update(SDL_Event sdlEvent)
 	{
 		FurRenderingEngine::regenTexture(FUR_OBJ);
 	}
-
+	if (keys[SDL_SCANCODE_Q])
+	{
+		FurRenderingEngine::resetModelRot(FUR_OBJ);
+	}
 }
 
 int main(int argc, char *argv[])

@@ -13,6 +13,8 @@ uniform vec3 gravity;
 
 uniform vec4 fur_colour;
 
+uniform float time;
+
 in  vec3 in_Position;
 in  vec3 in_Normal;
 
@@ -28,12 +30,16 @@ out vec4 ex_furColour;
 void main(void) {
 
 	vec3 shell = in_Position.xyz + ((in_Normal.xyz * layer)*displacement);
-	
-	float k = pow(layer/25,2);
 
+	float k = pow(layer/60,2);
 	shell = shell + (gravity*k);
 
+	shell.x += time*layer*0.004f;
+
 	vec4 newPos = vec4(shell, 1.0);
+
+	if (newPos.y < -1.0)
+		newPos.y = -1.0;
 
 	gl_Position = (projection * modelview * newPos);
 

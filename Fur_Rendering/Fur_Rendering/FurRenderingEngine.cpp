@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <stack>
-#include <time.h>
 namespace FurRenderingEngine {
 	//shader
 	std::unordered_map<std::string, GLuint> shaders;
@@ -25,7 +24,9 @@ namespace FurRenderingEngine {
 
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
 
-	//glm::vec3 gravity;
+	glm::vec3 gravity;
+
+	float t = 0.0f;
 
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
 
@@ -49,7 +50,7 @@ namespace FurRenderingEngine {
 			{
 				int furChance = rand() % 100 + 1;
 
-				if (furChance > 75) {
+				if (furChance > 30) {
 					furTexture[i][j][0] = (GLubyte)0;		//r
 					furTexture[i][j][1] = (GLubyte)0;		//g
 					furTexture[i][j][2] = (GLubyte)0;		//b
@@ -113,11 +114,6 @@ namespace FurRenderingEngine {
 		SDL_FreeSurface(tmpSurface); // texture loaded, free the temporary buffer
 		return texID;	// return value of texture ID
 	}
-
-	/*void setGravity(glm::vec3 newGravity)
-	{
-		gravity = newGravity;
-	}*/
 
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
 	{
@@ -208,6 +204,58 @@ namespace FurRenderingEngine {
 		lambda(shaderProgram);
 	}
 
+	void calcModelGravity(Model m)
+	{
+		//GLfloat modelRotX = m.getRotX();
+		GLfloat modelRotZ = m.getRotZ();
+
+
+
+		if (modelRotZ <= 180.0f) {
+			GLfloat rotOver90 = modelRotZ / 90.0f;
+
+			GLfloat productWithAbsValue = rotOver90 * abs(gravity.y);
+
+			GLfloat subtractAbsValue = productWithAbsValue - abs(gravity.y);
+
+			//subtractAbsValue == newGrav.y
+			//newGrav.x == (gravity.y - subtractAbsValue)
+
+			GLfloat newX = gravity.y - subtractAbsValue;
+
+			glm::vec3 newGrav(newX, subtractAbsValue, 0.0);
+
+			//pass in new gravity!!! but keep old
+			int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
+			glUniform3fv(uniformIndex, 1, glm::value_ptr(newGrav));
+
+			std::cout << "gravity: " << newGrav.x << ", " << newGrav.y << ", 0\n";
+		}
+		else
+		{
+			GLfloat rotOver180 = modelRotZ / 180.0f;
+
+			GLfloat productWithAbsValue = rotOver180 * (abs(gravity.y) * 2);
+
+			GLfloat subtractAbsValue = productWithAbsValue - (abs(gravity.y) * 2);
+
+			GLfloat reSubtractAbsValue = subtractAbsValue - (abs(gravity.y) * 2);
+
+			//reSubtractAbsValue == newGrav.x
+			GLfloat newY = gravity.y - reSubtractAbsValue;
+
+			glm::vec3 newGrav(reSubtractAbsValue, newY, 0.0);
+
+			//pass in new gravity!!! but keep old
+			int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
+			glUniform3fv(uniformIndex, 1, glm::value_ptr(newGrav));
+
+			std::cout << "gravity: " << newGrav.x << ", " << newGrav.y << ", 0\n";
+		}
+
+
+	}
+
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
 
@@ -225,9 +273,12 @@ namespace FurRenderingEngine {
 
 		models.insert_or_assign(modelName, m);
 
-		/*
-		int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
-		glUniform1f(uniformIndex, i);*/
+		/*std::cout << "rot z: " << m.getRotZ() << std::endl;
+
+		if (rotX != 0.0f || rotZ != 0.0f)
+		{
+			calcModelGravity(m);
+		}*/
 	}
 
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
@@ -241,8 +292,6 @@ namespace FurRenderingEngine {
 	void draw()
 	{
 		//for each model in models vector - draw
-
-		//glEnable(GL_CULL_FACE);
 		glClearColor(0.0f, 0.75f, 0.75f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -252,7 +301,7 @@ namespace FurRenderingEngine {
 		at = moveForward(eye, 0.0f, 1.0f);
 		mvStack.top() = glm::lookAt(eye, at, up);
 
-		//glCullFace(GL_BACK);
+		t += 0.01f;
 
 		for (auto m : models)
 		{
@@ -263,6 +312,9 @@ namespace FurRenderingEngine {
 
 				int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
 				glUniform1f(uniformIndex, i);
+
+				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "time");
+				glUniform1f(uniformIndex, sin(t));
 
 				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
@@ -287,5 +339,33 @@ namespace FurRenderingEngine {
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
 
+	}
+
+	void resetModelRot(std::string modelName)
+	{
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (updateModelRot): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+
+		m.setRotX(0.0f);
+		m.setRotY(0.0f);
+		m.setRotZ(0.0f);
+
+		models.insert_or_assign(modelName, m);
+
+		//reset gravity
+		int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
+
+		std::cout << "gravity: " << gravity.x << ", " << gravity.y << ", 0\n";
+	}
+
+	void setGravity(glm::vec3 grav)
+	{
+		gravity = grav;
 	}
 }
