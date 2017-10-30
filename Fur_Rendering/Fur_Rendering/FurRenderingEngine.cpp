@@ -71,8 +71,6 @@ namespace FurRenderingEngine {
 					furTexture[i][j][3] = (GLubyte)255;		//a
 				}
 
-
-				//furTexture[i][j][3] = (GLubyte)255;		//a
 			}
 		}
 
