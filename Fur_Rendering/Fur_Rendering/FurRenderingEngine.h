@@ -41,6 +41,7 @@ namespace FurRenderingEngine {
 
 	void setNumLayers(int num_l);
 
+	//for later
 	void setFurChance(int fur_c);
 }
 

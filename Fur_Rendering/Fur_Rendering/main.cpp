@@ -45,6 +45,8 @@ void init()
 	//shaders
 	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
+	//---------------- setting uniforms
+
 	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 	{
 		glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
@@ -54,6 +56,7 @@ void init()
 	}
 	);
 
+	//the magnitude of the y value describes how intense the gravity is
 	glm::vec3 gravity(0.0, -0.5, 0.0);
 
 	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity](GLuint shader)
@@ -71,10 +74,6 @@ void init()
 		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
 	}
 	);
-	
-	int num_layers = 60;
-
-	FurRenderingEngine::setNumLayers(num_layers);
 
 	int gravity_effect = 60;
 
@@ -86,10 +85,18 @@ void init()
 		FurRenderingEngine::setGravityEffect(gravity_effect);
 	}
 	);
+	
+	//---------------- setting fur rendering engine values
+
+	int num_layers = 60;
+
+	FurRenderingEngine::setNumLayers(num_layers);
 
 	int fur_chance = 30;
 
 	FurRenderingEngine::setFurChance(fur_chance);
+
+	//------------------ adding models with initialised shader
 
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
 		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
@@ -99,6 +106,7 @@ void update(SDL_Event sdlEvent)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
+	//-------- rotating around each axis
 	if (keys[SDL_SCANCODE_COMMA])
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
@@ -123,10 +131,15 @@ void update(SDL_Event sdlEvent)
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
 	}
+
+	//------------ regenerating fur texture 
+	//	- could be used in conjunction with setFurChance to adjust how much fur an object has
 	if (keys[SDL_SCANCODE_R])
 	{
 		FurRenderingEngine::regenTexture(FUR_OBJ);
 	}
+
+	//------------ resetting model rotation
 	if (keys[SDL_SCANCODE_Q])
 	{
 		FurRenderingEngine::resetModelRot(FUR_OBJ);
@@ -162,7 +175,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		FurRenderingEngine::draw(); //can be called custom draw method
+		FurRenderingEngine::draw(); //can be called from custom draw method
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 
