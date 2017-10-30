@@ -42,6 +42,7 @@ void init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	/*
 	//shaders
 	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
@@ -92,14 +93,16 @@ void init()
 	FurRenderingEngine::setFurChance(fur_chance);
 
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);*/
+
+	//enter init code here
 }
 
 void update(SDL_Event sdlEvent)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-	if (keys[SDL_SCANCODE_COMMA])
+	/*if (keys[SDL_SCANCODE_COMMA])
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 	}
@@ -130,7 +133,9 @@ void update(SDL_Event sdlEvent)
 	if (keys[SDL_SCANCODE_Q])
 	{
 		FurRenderingEngine::resetModelRot(FUR_OBJ);
-	}
+	}*/
+
+	//enter keyboard handling and pther update code here
 }
 
 int main(int argc, char *argv[])
@@ -162,7 +167,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		FurRenderingEngine::draw(); //can be called custom draw method
+		FurRenderingEngine::draw(); //can be called in custom draw method
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 
