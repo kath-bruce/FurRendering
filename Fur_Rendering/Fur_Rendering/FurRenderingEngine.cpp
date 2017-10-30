@@ -32,6 +32,9 @@ namespace FurRenderingEngine {
 	//used with current layer in vertex shader to 
 	int gravity_effect;
 
+	//
+	int fur_chance;
+
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
 
 	GLuint generateTexture()
@@ -52,22 +55,24 @@ namespace FurRenderingEngine {
 		{
 			for (int j = 0; j < FUR_TEXTURE_DIMENSION; j++)
 			{
-				int furChance = rand() % 100 + 1;
+				int furPoint = rand() % 100 + 1;
 
-				if (furChance > 30) {
+				if (furPoint > fur_chance) {
 					furTexture[i][j][0] = (GLubyte)0;		//r
 					furTexture[i][j][1] = (GLubyte)0;		//g
 					furTexture[i][j][2] = (GLubyte)0;		//b
+					furTexture[i][j][3] = (GLubyte)0;		//a
 				}
 				else
 				{
 					furTexture[i][j][0] = (GLubyte)255;		//r
 					furTexture[i][j][1] = (GLubyte)255;		//g
 					furTexture[i][j][2] = (GLubyte)255;		//b
+					furTexture[i][j][3] = (GLubyte)255;		//a
 				}
 
 
-				furTexture[i][j][3] = (GLubyte)255;		//a
+				//furTexture[i][j][3] = (GLubyte)255;		//a
 			}
 		}
 
@@ -80,6 +85,7 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
+	//for later
 	GLuint loadBitmap(const char * fname)
 	{
 		GLuint texID;
@@ -228,10 +234,12 @@ namespace FurRenderingEngine {
 		models.insert_or_assign(modelName, m);
 	}
 
+	//for later
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
 		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
 	}
 
+	//for later
 	glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
 		return glm::vec3(pos.x + d*std::cos(angle*DEG_TO_RADIAN), pos.y, pos.z + d*std::sin(angle*DEG_TO_RADIAN));
 	}
@@ -313,5 +321,10 @@ namespace FurRenderingEngine {
 	void setNumLayers(int num_l)
 	{
 		num_layers = num_l;
+	}
+
+	void setFurChance(int fur_c)
+	{
+		fur_chance = fur_c;
 	}
 }

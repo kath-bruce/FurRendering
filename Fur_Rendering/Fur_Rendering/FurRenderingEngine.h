@@ -23,10 +23,10 @@ namespace FurRenderingEngine {
 	void addModel(const char * modelFileName, glm::vec3 pos,
 		glm::vec3 scale, std::string modelName, std::string shaderName);
 
-	//set light
+	//set light - for later
 	void setLight(std::string shaderName, rt3d::lightStruct light);
 
-	//set material
+	//set material - for later
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
 
 	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda); 
@@ -37,10 +37,10 @@ namespace FurRenderingEngine {
 
 	void resetModelRot(std::string modelName);
 
-	//void setGravity(glm::vec3 grav);
-
 	void setGravityEffect(int grav_effect);
 
 	void setNumLayers(int num_l);
+
+	void setFurChance(int fur_c);
 }
 
