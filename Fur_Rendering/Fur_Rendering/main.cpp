@@ -87,6 +87,10 @@ void init()
 	}
 	);
 
+	int fur_chance = 30;
+
+	FurRenderingEngine::setFurChance(fur_chance);
+
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
 		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
 }

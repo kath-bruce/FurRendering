@@ -7,14 +7,14 @@ uniform mat4 projection;
 uniform vec3 displacement;
 uniform float layer;
 uniform vec3 gravity;
-uniform float time;
 uniform int gravity_effect;
+uniform float time;
 
 uniform vec4 fur_colour;
 
 in  vec3 in_Position;
 in  vec3 in_Normal;
-in vec2 in_TexCoord;
+in  vec2 in_TexCoord;
 
 out vec2 ex_TexCoord;
 out float ex_fragLayer;
