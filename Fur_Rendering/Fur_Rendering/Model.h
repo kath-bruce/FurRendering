@@ -17,8 +17,6 @@ private:
 	GLuint meshIndexCount;
 	GLuint shaderProgram;
 
-	//glm::quat rot;
-
 public:
 	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
 

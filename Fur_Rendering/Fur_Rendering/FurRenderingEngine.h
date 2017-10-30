@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-//#include <chrono>
 #include <time.h>
 #include "rt3d.h"
 #include "rt3dObjLoader.h"
@@ -16,7 +15,6 @@ namespace FurRenderingEngine {
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
 	#define FUR_TEXTURE_DIMENSION 512
-	#define FUR_LAYERS 60
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
@@ -31,7 +29,6 @@ namespace FurRenderingEngine {
 	//set material
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
 
-	//this should work so show it off somehow
 	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda); 
 
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
@@ -40,6 +37,10 @@ namespace FurRenderingEngine {
 
 	void resetModelRot(std::string modelName);
 
-	void setGravity(glm::vec3 grav);
+	//void setGravity(glm::vec3 grav);
+
+	void setGravityEffect(int grav_effect);
+
+	void setNumLayers(int num_l);
 }
 

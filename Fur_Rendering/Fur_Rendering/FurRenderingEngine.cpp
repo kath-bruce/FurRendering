@@ -21,12 +21,16 @@ namespace FurRenderingEngine {
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 
 	//projection
-
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
 
-	glm::vec3 gravity;
-
+	//time - used for swaying effect
 	float t = 0.0f;
+
+	//
+	int num_layers;
+
+	//used with current layer in vertex shader to 
+	int gravity_effect;
 
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
 
@@ -67,7 +71,7 @@ namespace FurRenderingEngine {
 			}
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FUR_TEXTURE_DIMENSION, 
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, FUR_TEXTURE_DIMENSION,
 			FUR_TEXTURE_DIMENSION, 0, GL_RGBA, GL_UNSIGNED_BYTE,
 			furTexture);
 
@@ -123,9 +127,13 @@ namespace FurRenderingEngine {
 			return;
 		}
 
-		GLuint shaderProgram = shaders[shaderName];
+		if (models.count(modelName) > 1)
+		{
+			std::cout << "ERROR (addModel): " << modelName << " has already been loaded!\n";
+			return;
+		}
 
-		//todo: check if model or texture has already been loaded?
+		GLuint shaderProgram = shaders[shaderName];
 
 		std::vector<GLfloat> verts;
 		std::vector<GLfloat> norms;
@@ -136,11 +144,10 @@ namespace FurRenderingEngine {
 
 		GLuint meshIndexCount = indices.size();
 
-		//todo: error checking i.e., if tex_coords.size() < 0 pass nullptr instead?
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
 		GLuint texture = generateTexture();
 
-		models.emplace(std::make_pair( modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram) ));
+		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram)));
 
 	}
 
@@ -164,7 +171,6 @@ namespace FurRenderingEngine {
 	{
 		GLuint shaderProgram = rt3d::initShaders(vert, frag);
 		shaders.insert({ shaderName, shaderProgram });
-
 	}
 
 	void setLight(std::string shaderName, rt3d::lightStruct light)
@@ -204,58 +210,6 @@ namespace FurRenderingEngine {
 		lambda(shaderProgram);
 	}
 
-	void calcModelGravity(Model m)
-	{
-		//GLfloat modelRotX = m.getRotX();
-		GLfloat modelRotZ = m.getRotZ();
-
-
-
-		if (modelRotZ <= 180.0f) {
-			GLfloat rotOver90 = modelRotZ / 90.0f;
-
-			GLfloat productWithAbsValue = rotOver90 * abs(gravity.y);
-
-			GLfloat subtractAbsValue = productWithAbsValue - abs(gravity.y);
-
-			//subtractAbsValue == newGrav.y
-			//newGrav.x == (gravity.y - subtractAbsValue)
-
-			GLfloat newX = gravity.y - subtractAbsValue;
-
-			glm::vec3 newGrav(newX, subtractAbsValue, 0.0);
-
-			//pass in new gravity!!! but keep old
-			int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
-			glUniform3fv(uniformIndex, 1, glm::value_ptr(newGrav));
-
-			std::cout << "gravity: " << newGrav.x << ", " << newGrav.y << ", 0\n";
-		}
-		else
-		{
-			GLfloat rotOver180 = modelRotZ / 180.0f;
-
-			GLfloat productWithAbsValue = rotOver180 * (abs(gravity.y) * 2);
-
-			GLfloat subtractAbsValue = productWithAbsValue - (abs(gravity.y) * 2);
-
-			GLfloat reSubtractAbsValue = subtractAbsValue - (abs(gravity.y) * 2);
-
-			//reSubtractAbsValue == newGrav.x
-			GLfloat newY = gravity.y - reSubtractAbsValue;
-
-			glm::vec3 newGrav(reSubtractAbsValue, newY, 0.0);
-
-			//pass in new gravity!!! but keep old
-			int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
-			glUniform3fv(uniformIndex, 1, glm::value_ptr(newGrav));
-
-			std::cout << "gravity: " << newGrav.x << ", " << newGrav.y << ", 0\n";
-		}
-
-
-	}
-
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
 
@@ -272,13 +226,6 @@ namespace FurRenderingEngine {
 		m.setRotZ(m.getRotZ() + rotZ);
 
 		models.insert_or_assign(modelName, m);
-
-		/*std::cout << "rot z: " << m.getRotZ() << std::endl;
-
-		if (rotX != 0.0f || rotZ != 0.0f)
-		{
-			calcModelGravity(m);
-		}*/
 	}
 
 	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
@@ -305,7 +252,7 @@ namespace FurRenderingEngine {
 
 		for (auto m : models)
 		{
-			for (int i = 0; i < FUR_LAYERS; i++)
+			for (int i = 0; i < num_layers; i++)
 			{
 				glUseProgram(m.second.getShaderProgram());
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
@@ -356,16 +303,15 @@ namespace FurRenderingEngine {
 		m.setRotZ(0.0f);
 
 		models.insert_or_assign(modelName, m);
-
-		//reset gravity
-		int uniformIndex = glGetUniformLocation(m.getShaderProgram(), "gravity");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
-
-		std::cout << "gravity: " << gravity.x << ", " << gravity.y << ", 0\n";
 	}
 
-	void setGravity(glm::vec3 grav)
+	void setGravityEffect(int grav_effect)
 	{
-		gravity = grav;
+		gravity_effect = grav_effect;
+	}
+
+	void setNumLayers(int num_l)
+	{
+		num_layers = num_l;
 	}
 }

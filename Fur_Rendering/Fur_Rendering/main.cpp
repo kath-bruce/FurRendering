@@ -5,7 +5,8 @@
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
-#define FUR_OBJ "furObj"
+#define FUR_SHADER "fur_shader"
+#define FUR_OBJ "fur_Obj"
 
 // Set up rendering context
 SDL_Window * setupRC(SDL_GLContext &context) {
@@ -42,9 +43,9 @@ void init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//shaders
-	FurRenderingEngine::addShader(FUR_OBJ, "fur.vert", "fur.frag");
+	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
-	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 	{
 		glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
 
@@ -55,16 +56,14 @@ void init()
 
 	glm::vec3 gravity(0.0, -0.5, 0.0);
 
-	FurRenderingEngine::setUniform(FUR_OBJ, [&gravity](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity](GLuint shader)
 	{
 		int uniformIndex = glGetUniformLocation(shader, "gravity");
 		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
-
-		FurRenderingEngine::setGravity(gravity);
 	}
 	);
 
-	FurRenderingEngine::setUniform(FUR_OBJ, [](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 	{
 		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
 
@@ -73,11 +72,23 @@ void init()
 	}
 	);
 	
-	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_OBJ);
+	int num_layers = 60;
 
-	/*FurRenderingEngine::addModel("cat.obj", glm::vec3(0.0f, 1.0f, -3.0f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_OBJ);*/
+	FurRenderingEngine::setNumLayers(num_layers);
+
+	int gravity_effect = 60;
+
+	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+		glUniform1i(uniformIndex, gravity_effect);
+
+		FurRenderingEngine::setGravityEffect(gravity_effect);
+	}
+	);
+
+	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
 }
 
 void update(SDL_Event sdlEvent)
@@ -131,6 +142,7 @@ int main(int argc, char *argv[])
 		std::cout << "glewInit failed, aborting." << std::endl;
 		exit(1);
 	}
+
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	init();
@@ -146,7 +158,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		FurRenderingEngine::draw();
+		FurRenderingEngine::draw(); //can be called custom draw method
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 
