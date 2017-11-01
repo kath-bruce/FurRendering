@@ -96,21 +96,27 @@ void init()
 		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);*/
 
 	//enter init code here
+
+	FurRenderingEngine::addShader("textured", "textured.vert", "textured.frag");
+
+	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.5f, 0.5f, 0.5f), "cube", "textured");
+
+
 }
 
 void update(SDL_Event sdlEvent)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-	/*if (keys[SDL_SCANCODE_COMMA])
+	if (keys[SDL_SCANCODE_COMMA])
 	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot("cube", 0.0f, 1.5f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_PERIOD])
 	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot("cube", 0.0f, -1.5f, 0.0f);
 	}
-	if (keys[SDL_SCANCODE_UP])
+	/*if (keys[SDL_SCANCODE_UP])
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 	}
@@ -136,6 +142,11 @@ void update(SDL_Event sdlEvent)
 	}*/
 
 	//enter keyboard handling and pther update code here
+}
+
+void draw()
+{
+	FurRenderingEngine::draw();
 }
 
 int main(int argc, char *argv[])
@@ -167,7 +178,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		FurRenderingEngine::draw(); //can be called in custom draw method
+		draw(); //can be called in custom draw method
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 

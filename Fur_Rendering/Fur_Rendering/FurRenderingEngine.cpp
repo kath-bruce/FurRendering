@@ -27,13 +27,13 @@ namespace FurRenderingEngine {
 	float t = 0.0f;
 
 	//
-	int num_layers;
+	int num_layers = 1;
 
 	//used with current layer in vertex shader to 
-	int gravity_effect;
+	int gravity_effect = 60;
 
 	//
-	int fur_chance;
+	int fur_chance = 30;
 
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
 
