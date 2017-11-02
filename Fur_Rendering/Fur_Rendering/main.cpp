@@ -137,8 +137,6 @@ void init()
 	{
 		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
 		glUniform1i(uniformIndex, gravity_effect);
-
-		FurRenderingEngine::setGravityEffect(gravity_effect);
 	}
 	);
 }
@@ -210,6 +208,8 @@ int main(int argc, char *argv[])
 	SDL_Event sdlEvent;  // variable to detect SDL events
 	while (running) {	// the event loop
 		while (SDL_PollEvent(&sdlEvent)) {
+
+			//when closing the window or pressing the escape key, close the program
 			if (sdlEvent.type == SDL_QUIT || sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 				running = false;
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		draw(); //can be called in custom draw method
+		draw();
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 

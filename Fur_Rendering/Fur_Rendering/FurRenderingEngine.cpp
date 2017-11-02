@@ -13,9 +13,9 @@ namespace FurRenderingEngine {
 	//mvstack
 	std::stack<glm::mat4> mvStack;
 
-	//eye
-	//at
-	//up
+	//eye	- camera
+	//at	- point camera initially faces
+	//up	- unit up vector
 	glm::vec3 eye(0.0f, 1.0f, 0.0f);
 	glm::vec3 at(0.0f, 1.0f, -1.0f);
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
@@ -26,13 +26,10 @@ namespace FurRenderingEngine {
 	//time - used for swaying effect
 	float t = 0.0f;
 
-	//
+	//default value of one to ensure the models are rendered at least once
 	int num_layers = 1;
 
-	//used with current layer in vertex shader to 
-	int gravity_effect = 60;
-
-	//
+	//used during fur texture generation
 	int fur_chance = 30;
 
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
@@ -125,12 +122,15 @@ namespace FurRenderingEngine {
 
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
 	{
+		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
 		if (shaders.count(shaderName) < 1)
 		{
 			std::cout << "ERROR (addModel): " << shaderName << " has not been initialised!\n";
 			return;
 		}
 
+		//this is a small check to ensure that the same model is not repeastedly loaded from file
+		//passing a different model name will allow another copy to be loaded if needed
 		if (models.count(modelName) > 1)
 		{
 			std::cout << "ERROR (addModel): " << modelName << " has already been loaded!\n";
@@ -159,7 +159,7 @@ namespace FurRenderingEngine {
 	{
 		if (models.count(modelName) < 1)
 		{
-			std::cout << "ERROR (updateModelPosScaleRot): " << modelName << " has not been initialised!\n";
+			std::cout << "ERROR (regenTexture): " << modelName << " has not been initialised!\n";
 			return;
 		}
 
@@ -168,6 +168,7 @@ namespace FurRenderingEngine {
 
 		m.setTexture(text);
 
+		//this is to ensure the model with the new texture is the only version of the model
 		models.insert_or_assign(modelName, m);
 	}
 
@@ -229,6 +230,7 @@ namespace FurRenderingEngine {
 		m.setRotY(m.getRotY() + rotY);
 		m.setRotZ(m.getRotZ() + rotZ);
 
+		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
 	}
 
@@ -258,16 +260,18 @@ namespace FurRenderingEngine {
 
 		for (auto m : models)
 		{
+			//this needs to be set once for every model every frame
+			int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "time");
+			glUniform1f(uniformIndex, sin(t));
+
 			for (int i = 0; i < num_layers; i++)
 			{
 				glUseProgram(m.second.getShaderProgram());
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
 
-				int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
+				//this needs to be set for every layer
+				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
 				glUniform1f(uniformIndex, i);
-
-				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "time");
-				glUniform1f(uniformIndex, sin(t));
 
 				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
@@ -298,7 +302,7 @@ namespace FurRenderingEngine {
 	{
 		if (models.count(modelName) < 1)
 		{
-			std::cout << "ERROR (updateModelRot): " << modelName << " has not been initialised!\n";
+			std::cout << "ERROR (resetModelRot): " << modelName << " has not been initialised!\n";
 			return;
 		}
 
@@ -308,12 +312,8 @@ namespace FurRenderingEngine {
 		m.setRotY(0.0f);
 		m.setRotZ(0.0f);
 
+		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
-	}
-
-	void setGravityEffect(int grav_effect)
-	{
-		gravity_effect = grav_effect;
 	}
 
 	void setNumLayers(int num_l)

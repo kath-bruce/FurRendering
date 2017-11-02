@@ -18,6 +18,7 @@ namespace FurRenderingEngine {
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
+	//use this after set the fur chance to generate a new texture using that fur chance
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
@@ -33,14 +34,16 @@ namespace FurRenderingEngine {
 
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
 
+	//this draws all the models that have been added
 	void draw();
 
+	//this is used when degrees of freedom has been lost while rotating models
 	void resetModelRot(std::string modelName);
 
-	void setGravityEffect(int grav_effect);
-
+	//use this to set the number of layers for each model to have rendered
 	void setNumLayers(int num_l);
 
+	//use this to set 
 	void setFurChance(int fur_c);
 }
 
