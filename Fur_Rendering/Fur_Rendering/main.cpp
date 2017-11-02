@@ -112,6 +112,35 @@ void init()
 	FurRenderingEngine::setNumLayers(60);
 
 	FurRenderingEngine::setUniform("fur", setDisplacement);
+
+	FurRenderingEngine::setUniform("fur", [](GLuint shader)
+	{
+		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
+
+		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
+		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
+	}
+	);
+
+	glm::vec3 gravity(0.0, -0.5, 0.0);
+
+	FurRenderingEngine::setUniform("fur", [&gravity](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "gravity");
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
+	}
+	);
+
+	int gravity_effect = 120;
+
+	FurRenderingEngine::setUniform("fur", [&gravity_effect](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+		glUniform1i(uniformIndex, gravity_effect);
+
+		FurRenderingEngine::setGravityEffect(gravity_effect);
+	}
+	);
 }
 
 void update(SDL_Event sdlEvent)
