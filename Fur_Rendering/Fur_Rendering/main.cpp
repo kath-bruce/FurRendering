@@ -50,7 +50,7 @@ void init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	/*
+	
 	//shaders
 	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
@@ -90,8 +90,13 @@ void init()
 	{
 		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
 		glUniform1i(uniformIndex, gravity_effect);
+	}
+	);
 
-		FurRenderingEngine::setGravityEffect(gravity_effect);
+	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+		glUniform1i(uniformIndex, 20);
 	}
 	);
 	
@@ -101,51 +106,12 @@ void init()
 
 	FurRenderingEngine::setNumLayers(num_layers);
 
-	int fur_chance = 30;
-
-	FurRenderingEngine::setFurChance(fur_chance);
-
 	//------------------ adding models with initialised shader
 
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);*/
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
 
-	//enter init code here
-
-	FurRenderingEngine::addShader("fur", "fur_tut.vert", "fur_tut.frag");
-
-	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.5f, 0.5f, 0.5f), "cube", "fur");
-
-	FurRenderingEngine::setNumLayers(60);
-
-	FurRenderingEngine::setUniform("fur", setDisplacement);
-
-	FurRenderingEngine::setUniform("fur", [](GLuint shader)
-	{
-		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
-
-		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
-		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
-	}
-	);
-
-	glm::vec3 gravity(0.0, -0.5, 0.0);
-
-	FurRenderingEngine::setUniform("fur", [&gravity](GLuint shader)
-	{
-		int uniformIndex = glGetUniformLocation(shader, "gravity");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
-	}
-	);
-
-	int gravity_effect = 60;
-
-	FurRenderingEngine::setUniform("fur", [&gravity_effect](GLuint shader)
-	{
-		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
-		glUniform1i(uniformIndex, gravity_effect);
-	}
-	);
+	
 }
 
 void update(SDL_Event sdlEvent)
@@ -155,13 +121,13 @@ void update(SDL_Event sdlEvent)
 	//-------- rotating around each axis
 	if (keys[SDL_SCANCODE_COMMA])
 	{
-		FurRenderingEngine::updateModelRot("cube", 0.0f, 1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_PERIOD])
 	{
-		FurRenderingEngine::updateModelRot("cube", 0.0f, -1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
 	}
-	/*if (keys[SDL_SCANCODE_UP])
+	if (keys[SDL_SCANCODE_UP])
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 	}
@@ -189,9 +155,7 @@ void update(SDL_Event sdlEvent)
 	if (keys[SDL_SCANCODE_Q])
 	{
 		FurRenderingEngine::resetModelRot(FUR_OBJ);
-	}*/
-
-	//enter keyboard handling and pther update code here
+	}
 }
 
 void draw()
