@@ -43,7 +43,7 @@ namespace FurRenderingEngine {
 	//use this to set the number of layers for each model to have rendered
 	void setNumLayers(int num_l);
 
-	//use this to set 
+	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
 }
 
