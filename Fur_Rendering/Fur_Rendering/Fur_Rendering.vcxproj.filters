@@ -58,5 +58,11 @@
     <None Include="textured.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="fur_tut.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fur_tut.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

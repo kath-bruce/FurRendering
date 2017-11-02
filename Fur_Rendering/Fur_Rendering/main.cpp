@@ -36,6 +36,14 @@ SDL_Window * setupRC(SDL_GLContext &context) {
 	return window;
 }
 
+void setDisplacement(GLuint shader)
+{
+	glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
+
+	int uniformIndex = glGetUniformLocation(shader, "displacement");
+	glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+}
+
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -97,11 +105,13 @@ void init()
 
 	//enter init code here
 
-	FurRenderingEngine::addShader("textured", "textured.vert", "textured.frag");
+	FurRenderingEngine::addShader("fur", "fur_tut.vert", "fur_tut.frag");
 
-	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.5f, 0.5f, 0.5f), "cube", "textured");
+	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.5f, 0.5f, 0.5f), "cube", "fur");
 
+	FurRenderingEngine::setNumLayers(60);
 
+	FurRenderingEngine::setUniform("fur", setDisplacement);
 }
 
 void update(SDL_Event sdlEvent)

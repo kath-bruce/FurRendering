@@ -157,6 +157,8 @@
   <ItemGroup>
     <None Include="fur.frag" />
     <None Include="fur.vert" />
+    <None Include="fur_tut.frag" />
+    <None Include="fur_tut.vert" />
     <None Include="textured.frag" />
     <None Include="textured.vert" />
   </ItemGroup>
