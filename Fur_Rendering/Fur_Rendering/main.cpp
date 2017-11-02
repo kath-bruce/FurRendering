@@ -36,12 +36,21 @@ SDL_Window * setupRC(SDL_GLContext &context) {
 	return window;
 }
 
+void setDisplacement(GLuint shader)
+{
+	glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
+
+	int uniformIndex = glGetUniformLocation(shader, "displacement");
+	glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+}
+
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	/*
 	//shaders
 	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
@@ -99,7 +108,44 @@ void init()
 	//------------------ adding models with initialised shader
 
 	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
+		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);*/
+
+	//enter init code here
+
+	FurRenderingEngine::addShader("fur", "fur_tut.vert", "fur_tut.frag");
+
+	FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, -2.0f), glm::vec3(0.5f, 0.5f, 0.5f), "cube", "fur");
+
+	FurRenderingEngine::setNumLayers(60);
+
+	FurRenderingEngine::setUniform("fur", setDisplacement);
+
+	FurRenderingEngine::setUniform("fur", [](GLuint shader)
+	{
+		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
+
+		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
+		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
+	}
+	);
+
+	glm::vec3 gravity(0.0, -0.5, 0.0);
+
+	FurRenderingEngine::setUniform("fur", [&gravity](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "gravity");
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
+	}
+	);
+
+	int gravity_effect = 60;
+
+	FurRenderingEngine::setUniform("fur", [&gravity_effect](GLuint shader)
+	{
+		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+		glUniform1i(uniformIndex, gravity_effect);
+	}
+	);
 }
 
 void update(SDL_Event sdlEvent)
@@ -109,13 +155,13 @@ void update(SDL_Event sdlEvent)
 	//-------- rotating around each axis
 	if (keys[SDL_SCANCODE_COMMA])
 	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot("cube", 0.0f, 1.5f, 0.0f);
 	}
 	if (keys[SDL_SCANCODE_PERIOD])
 	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
+		FurRenderingEngine::updateModelRot("cube", 0.0f, -1.5f, 0.0f);
 	}
-	if (keys[SDL_SCANCODE_UP])
+	/*if (keys[SDL_SCANCODE_UP])
 	{
 		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 	}
@@ -143,7 +189,14 @@ void update(SDL_Event sdlEvent)
 	if (keys[SDL_SCANCODE_Q])
 	{
 		FurRenderingEngine::resetModelRot(FUR_OBJ);
-	}
+	}*/
+
+	//enter keyboard handling and pther update code here
+}
+
+void draw()
+{
+	FurRenderingEngine::draw();
 }
 
 int main(int argc, char *argv[])
@@ -168,6 +221,8 @@ int main(int argc, char *argv[])
 	SDL_Event sdlEvent;  // variable to detect SDL events
 	while (running) {	// the event loop
 		while (SDL_PollEvent(&sdlEvent)) {
+
+			//when closing the window or pressing the escape key, close the program
 			if (sdlEvent.type == SDL_QUIT || sdlEvent.key.keysym.sym == SDLK_ESCAPE)
 				running = false;
 
@@ -175,7 +230,7 @@ int main(int argc, char *argv[])
 
 		update(sdlEvent);
 
-		FurRenderingEngine::draw(); //can be called from custom draw method
+		draw();
 		SDL_GL_SwapWindow(window); // swap buffers
 	}
 
