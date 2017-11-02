@@ -131,7 +131,7 @@ void init()
 	}
 	);
 
-	int gravity_effect = 120;
+	int gravity_effect = 60;
 
 	FurRenderingEngine::setUniform("fur", [&gravity_effect](GLuint shader)
 	{
