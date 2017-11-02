@@ -52,17 +52,5 @@
     <None Include="fur.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="textured.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="textured.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fur_tut.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fur_tut.vert">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
