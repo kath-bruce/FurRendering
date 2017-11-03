@@ -5,7 +5,7 @@
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
-#define FUR_SHADER "fur_shader"
+#define FUR_SHADER "fur_Shader"
 #define FUR_OBJ "fur_Obj"
 
 //the magnitude of the y value describes how intense the gravity is
