@@ -8,6 +8,16 @@
 #define FUR_SHADER "fur_shader"
 #define FUR_OBJ "fur_Obj"
 
+//the magnitude of the y value describes how intense the gravity is
+int grav_effect = 60;
+
+int layers = 60;
+int cutoffLayer = 20;
+
+//reference: http://www.xbdev.net/directx3dx/specialX/Fur/
+//reference: https://github.com/sdao/fur-demo
+//reference: https://stackoverflow.com/questions/12969971/is-it-possible-to-manually-create-image-data-for-opengl-texture-use
+
 // Set up rendering context
 SDL_Window * setupRC(SDL_GLContext &context) {
 	SDL_Window * window;
@@ -36,14 +46,6 @@ SDL_Window * setupRC(SDL_GLContext &context) {
 	return window;
 }
 
-void setDisplacement(GLuint shader)
-{
-	glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
-
-	int uniformIndex = glGetUniformLocation(shader, "displacement");
-	glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
-}
-
 void init()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -65,13 +67,12 @@ void init()
 	}
 	);
 
-	//the magnitude of the y value describes how intense the gravity is
-	glm::vec3 gravity(0.0, -0.5, 0.0);
+	glm::vec3 gravity_vec(0.0, -0.5, 0.0);
 
-	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity](GLuint shader)
+	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_vec](GLuint shader)
 	{
 		int uniformIndex = glGetUniformLocation(shader, "gravity");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity));
+		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity_vec));
 	}
 	);
 
@@ -84,7 +85,7 @@ void init()
 	}
 	);
 
-	int gravity_effect = 60;
+	int gravity_effect = grav_effect;
 
 	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
 	{
@@ -93,16 +94,18 @@ void init()
 	}
 	);
 
-	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+	int cutoff_Layer = cutoffLayer;
+
+	FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
 	{
 		int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
-		glUniform1i(uniformIndex, 20);
+		glUniform1i(uniformIndex, cutoff_Layer);
 	}
 	);
 	
 	//---------------- setting fur rendering engine values
 
-	int num_layers = 60;
+	int num_layers = layers;
 
 	FurRenderingEngine::setNumLayers(num_layers);
 
@@ -156,6 +159,67 @@ void update(SDL_Event sdlEvent)
 	{
 		FurRenderingEngine::resetModelRot(FUR_OBJ);
 	}
+
+	//----------- increasing and decreasing gravity
+	if (keys[SDL_SCANCODE_1])
+	{
+		int gravity_effect = --grav_effect;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+			glUniform1i(uniformIndex, gravity_effect);
+		}
+		);
+	}
+	if (keys[SDL_SCANCODE_2])
+	{
+		int gravity_effect = ++grav_effect;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+			glUniform1i(uniformIndex, gravity_effect);
+		}
+		);
+	}
+
+	//----------- increasing and decreasing fur length
+	if (keys[SDL_SCANCODE_3])
+	{
+		int cutoff_Layer = --cutoffLayer;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+			glUniform1i(uniformIndex, cutoff_Layer);
+		}
+		);
+	}
+	if (keys[SDL_SCANCODE_4])
+	{
+		int cutoff_Layer = ++cutoffLayer;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+			glUniform1i(uniformIndex, cutoff_Layer);
+		}
+		);
+	}
+	if (keys[SDL_SCANCODE_5])
+	{
+		int num_layers = --layers;
+
+		FurRenderingEngine::setNumLayers(num_layers);
+	}
+	if (keys[SDL_SCANCODE_6])
+	{
+		int num_layers = ++layers;
+
+		FurRenderingEngine::setNumLayers(num_layers);
+	}
+
 }
 
 void draw()
