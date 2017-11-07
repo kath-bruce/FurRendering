@@ -2,6 +2,11 @@
 #pragma comment(linker, "/subsystem:\"console\" /entry:\"WinMainCRTStartup\"")
 #endif
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//change 'false' to 'true' to get tutorial base
+#define TUTORIAL_BASE false
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 #include "FurRenderingEngine.h"
 #include <SDL.h>
 
@@ -52,183 +57,187 @@ void init()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	
-	//shaders
-	FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
-
-	//---------------- setting uniforms
-
-	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+	if (!TUTORIAL_BASE)
 	{
-		glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
+		//shaders
+		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 
-		int uniformIndex = glGetUniformLocation(shader, "displacement");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+		//---------------- setting uniforms
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+		{
+			glm::vec3 temp(0.00625, 0.00625, 0.00625); //space in between shells
+
+			int uniformIndex = glGetUniformLocation(shader, "displacement");
+			glUniform3fv(uniformIndex, 1, glm::value_ptr(temp));
+		}
+		);
+
+		glm::vec3 gravity_vec(0.0, -0.5, 0.0);
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_vec](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "gravity");
+			glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity_vec));
+		}
+		);
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+		{
+			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
+
+			int uniformIndex = glGetUniformLocation(shader, "fur_colour");
+			glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
+		}
+		);
+
+		int gravity_effect = grav_effect;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+			glUniform1i(uniformIndex, gravity_effect);
+		}
+		);
+
+		int cutoff_Layer = cutoffLayer;
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+		{
+			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+			glUniform1i(uniformIndex, cutoff_Layer);
+		}
+		);
+
+		//---------------- setting fur rendering engine values
+
+		int num_layers = layers;
+
+		FurRenderingEngine::setNumLayers(num_layers);
+
+		//------------------ adding models with initialised shader
+
+		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
+			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
+
 	}
-	);
-
-	glm::vec3 gravity_vec(0.0, -0.5, 0.0);
-
-	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_vec](GLuint shader)
-	{
-		int uniformIndex = glGetUniformLocation(shader, "gravity");
-		glUniform3fv(uniformIndex, 1, glm::value_ptr(gravity_vec));
-	}
-	);
-
-	FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
-	{
-		glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
-
-		int uniformIndex = glGetUniformLocation(shader, "fur_colour");
-		glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
-	}
-	);
-
-	int gravity_effect = grav_effect;
-
-	FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
-	{
-		int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
-		glUniform1i(uniformIndex, gravity_effect);
-	}
-	);
-
-	int cutoff_Layer = cutoffLayer;
-
-	FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
-	{
-		int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
-		glUniform1i(uniformIndex, cutoff_Layer);
-	}
-	);
-	
-	//---------------- setting fur rendering engine values
-
-	int num_layers = layers;
-
-	FurRenderingEngine::setNumLayers(num_layers);
-
-	//------------------ adding models with initialised shader
-
-	FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-		glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
-
-	
 }
 
 void update(SDL_Event sdlEvent)
 {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-	//-------- rotating around each axis
-	if (keys[SDL_SCANCODE_COMMA])
+	if (!TUTORIAL_BASE)
 	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
-	}
-	if (keys[SDL_SCANCODE_PERIOD])
-	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
-	}
-	if (keys[SDL_SCANCODE_UP])
-	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
-	}
-	if (keys[SDL_SCANCODE_DOWN])
-	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
-	}
-	if (keys[SDL_SCANCODE_LEFT])
-	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
-	}
-	if (keys[SDL_SCANCODE_RIGHT])
-	{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
-	}
-
-	//------------ regenerating fur texture 
-	//	- could be used in conjunction with setFurChance to adjust how much fur an object has
-	if (keys[SDL_SCANCODE_R])
-	{
-		FurRenderingEngine::regenTexture(FUR_OBJ);
-	}
-
-	//------------ resetting model rotation
-	if (keys[SDL_SCANCODE_Q])
-	{
-		FurRenderingEngine::resetModelRot(FUR_OBJ);
-	}
-
-	//----------- increasing and decreasing gravity
-	// - modifying the gravity vector does not make much difference
-	if (keys[SDL_SCANCODE_1])
-	{
-		int gravity_effect = --grav_effect;
-
-		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+		//-------- rotating around each axis
+		if (keys[SDL_SCANCODE_COMMA])
 		{
-			int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
-			glUniform1i(uniformIndex, gravity_effect);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 		}
-		);
-	}
-	if (keys[SDL_SCANCODE_2])
-	{
-		int gravity_effect = ++grav_effect;
-
-		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+		if (keys[SDL_SCANCODE_PERIOD])
 		{
-			int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
-			glUniform1i(uniformIndex, gravity_effect);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
 		}
-		);
-	}
-
-	//----------- increasing and decreasing fur length
-	// - cutoffLayer is where the fur will end if it is less than or equal to number of layers
-	if (keys[SDL_SCANCODE_3])
-	{
-		int cutoff_Layer = --cutoffLayer;
-
-		FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+		if (keys[SDL_SCANCODE_UP])
 		{
-			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
-			glUniform1i(uniformIndex, cutoff_Layer);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 		}
-		);
-	}
-	if (keys[SDL_SCANCODE_4])
-	{
-		int cutoff_Layer = ++cutoffLayer;
-
-		FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+		if (keys[SDL_SCANCODE_DOWN])
 		{
-			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
-			glUniform1i(uniformIndex, cutoff_Layer);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
 		}
-		);
+		if (keys[SDL_SCANCODE_LEFT])
+		{
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
+		}
+		if (keys[SDL_SCANCODE_RIGHT])
+		{
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
+		}
+
+		//------------ regenerating fur texture 
+		//	- could be used in conjunction with setFurChance to adjust how much fur an object has
+		if (keys[SDL_SCANCODE_R])
+		{
+			FurRenderingEngine::regenTexture(FUR_OBJ);
+		}
+
+		//------------ resetting model rotation
+		if (keys[SDL_SCANCODE_Q])
+		{
+			FurRenderingEngine::resetModelRot(FUR_OBJ);
+		}
+
+		//----------- increasing and decreasing gravity
+		// - modifying the gravity vector does not make much difference
+		if (keys[SDL_SCANCODE_1])
+		{
+			int gravity_effect = --grav_effect;
+
+			FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+			{
+				int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+				glUniform1i(uniformIndex, gravity_effect);
+			}
+			);
+		}
+		if (keys[SDL_SCANCODE_2])
+		{
+			int gravity_effect = ++grav_effect;
+
+			FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
+			{
+				int uniformIndex = glGetUniformLocation(shader, "gravity_effect");
+				glUniform1i(uniformIndex, gravity_effect);
+			}
+			);
+		}
+
+		//----------- increasing and decreasing fur length
+		// - cutoffLayer is where the fur will end if it is less than or equal to number of layers
+		if (keys[SDL_SCANCODE_3])
+		{
+			int cutoff_Layer = --cutoffLayer;
+
+			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+			{
+				int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+				glUniform1i(uniformIndex, cutoff_Layer);
+			}
+			);
+		}
+		if (keys[SDL_SCANCODE_4])
+		{
+			int cutoff_Layer = ++cutoffLayer;
+
+			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
+			{
+				int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
+				glUniform1i(uniformIndex, cutoff_Layer);
+			}
+			);
+		}
+
+		// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
+		if (keys[SDL_SCANCODE_5])
+		{
+			int num_layers = --layers;
+
+			FurRenderingEngine::setNumLayers(num_layers);
+		}
+		if (keys[SDL_SCANCODE_6])
+		{
+			int num_layers = ++layers;
+
+			FurRenderingEngine::setNumLayers(num_layers);
+		}
 	}
-
-	// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
-	if (keys[SDL_SCANCODE_5])
-	{
-		int num_layers = --layers;
-
-		FurRenderingEngine::setNumLayers(num_layers);
-	}
-	if (keys[SDL_SCANCODE_6])
-	{
-		int num_layers = ++layers;
-
-		FurRenderingEngine::setNumLayers(num_layers);
-	}
-
 }
 
 void draw()
 {
 	FurRenderingEngine::draw();
+	//other draw code could be added here
 }
 
 int main(int argc, char *argv[])
