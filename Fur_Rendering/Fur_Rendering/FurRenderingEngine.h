@@ -30,8 +30,10 @@ namespace FurRenderingEngine {
 	//set material - for later
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
 
+	//set uniform for a shader - specific type of uniform is set in the lambda
 	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda); 
 
+	//increases model rotation by rotX, rotY and rotZ
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
 
 	//this draws all the models that have been added

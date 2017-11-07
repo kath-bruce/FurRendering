@@ -161,6 +161,7 @@ void update(SDL_Event sdlEvent)
 	}
 
 	//----------- increasing and decreasing gravity
+	// - modifying the gravity vector does not make much difference
 	if (keys[SDL_SCANCODE_1])
 	{
 		int gravity_effect = --grav_effect;
@@ -185,6 +186,7 @@ void update(SDL_Event sdlEvent)
 	}
 
 	//----------- increasing and decreasing fur length
+	// - cutoffLayer is where the fur will end if it is less than or equal to number of layers
 	if (keys[SDL_SCANCODE_3])
 	{
 		int cutoff_Layer = --cutoffLayer;
@@ -207,6 +209,8 @@ void update(SDL_Event sdlEvent)
 		}
 		);
 	}
+
+	// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
 	if (keys[SDL_SCANCODE_5])
 	{
 		int num_layers = --layers;

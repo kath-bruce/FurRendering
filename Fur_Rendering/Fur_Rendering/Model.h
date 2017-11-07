@@ -18,6 +18,7 @@ private:
 	GLuint shaderProgram;
 
 public:
+	//rotation is initially set to 0 on all axes
 	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
 
 	GLuint getModel() { return model; }
@@ -30,6 +31,8 @@ public:
 
 	glm::vec3 getScale() { return scale; }
 	void setScale(glm::vec3 newScale) { scale = newScale;}
+
+	//-------- restrict each rot float between 0 and 360
 
 	GLfloat getRotX() { return rotX; }
 	void setRotX(GLfloat newRotX) { rotX = newRotX; 
@@ -54,6 +57,8 @@ public:
 		else if (rotZ < 0.0f)
 		{ rotZ = 360.0f; }
 	}
+
+	//----------
 
 	GLuint getMeshIndexCount() { return meshIndexCount; }
 	GLuint getShaderProgram() { return shaderProgram; }

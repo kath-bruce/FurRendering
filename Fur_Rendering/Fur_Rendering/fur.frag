@@ -18,7 +18,7 @@ void main(void) {
 	// Fragment colour
 
 	//gives a shadow effect based on the current layer
-	//increasing the division in the third parameter will lighten the shadow
+	//increasing the divisor in the third parameter will lighten the shadow
 	//in smaller increments, effectively making the fur darker
 	float fakeShadow = mix(0.4, 1.0, (ex_fragLayer/15.0));
 	vec4 furColour = fur_colour * fakeShadow;
@@ -26,7 +26,7 @@ void main(void) {
 	vec4 furData = texture(textureUnit0, ex_TexCoord);
 
 	//the cutoff point for when to decrease alpha
-	//remember that furData.a will be a float between 0 and 1
+	//since furData.a will be a float between 0 and 1
 	//if the alpha is 0, alpha will remain 0 at any layer
 	//if the alpha is 1, 
 	//the condition becomes - (if current layer > cutoffLayer)

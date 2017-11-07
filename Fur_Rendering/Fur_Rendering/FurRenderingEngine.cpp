@@ -52,6 +52,7 @@ namespace FurRenderingEngine {
 		{
 			for (int j = 0; j < FUR_TEXTURE_DIMENSION; j++)
 			{
+				//generate an integer between 1 and 100
 				int furPoint = rand() % 100 + 1;
 
 				if (furPoint > fur_chance) {

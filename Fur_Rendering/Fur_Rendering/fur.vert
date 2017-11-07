@@ -24,6 +24,9 @@ void main(void) {
 	vec3 shell = in_Position.xyz + in_Normal.xyz*layer*displacement;
 
 	//displacing the shell to create a gravity effect
+	//k is co-efficient that allows the shells to be displaced in a realistic manner
+	//k uses the current layer and a gravity effect variable to lessen the co-efficient
+	//as layer will be relatively large
 	float k = pow(layer/gravity_effect,2);
 	shell = shell + (gravity*k);
 
