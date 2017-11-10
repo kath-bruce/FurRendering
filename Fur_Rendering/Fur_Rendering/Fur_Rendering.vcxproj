@@ -155,6 +155,8 @@
     <ClInclude Include="rt3dObjLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cubeMap.frag" />
+    <None Include="cubeMap.vert" />
     <None Include="fur.frag" />
     <None Include="fur.vert" />
     <None Include="textured.frag" />

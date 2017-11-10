@@ -120,6 +120,15 @@ void init()
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
 			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
 
+		//------------------- adding skybox
+
+		const char *cubeTexFiles[6] = {
+			"town-skybox/Town_bk.bmp", "town-skybox/Town_ft.bmp",
+			"town-skybox/Town_rt.bmp", "town-skybox/Town_lf.bmp",
+			"town-skybox/Town2_up.bmp", "town-skybox/Town_dn.bmp"
+		};
+
+		FurRenderingEngine::addSkybox(cubeTexFiles, "cubeMap.vert", "cubeMap.frag");
 	}
 }
 

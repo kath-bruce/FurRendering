@@ -4,6 +4,8 @@
 #include <string>
 #include <stack>
 namespace FurRenderingEngine {
+	#define SKYBOX "skybox"
+
 	//shader
 	std::unordered_map<std::string, GLuint> shaders;
 
@@ -33,6 +35,11 @@ namespace FurRenderingEngine {
 	int fur_chance = 30;
 
 	GLubyte furTexture[FUR_TEXTURE_DIMENSION][FUR_TEXTURE_DIMENSION][4];
+
+	//skybox
+	GLuint skybox[5];
+	GLuint cube;
+	GLuint meshIndexCount;
 
 	GLuint generateTexture()
 	{
@@ -81,6 +88,42 @@ namespace FurRenderingEngine {
 		return texID;	// return value of texture ID
 	}
 
+	GLuint loadCubeMap(const char *fname[6], GLuint *texID)
+	{
+		glGenTextures(1, texID); // generate texture ID
+		GLenum sides[6] = { GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+			GL_TEXTURE_CUBE_MAP_NEGATIVE_Y };
+		SDL_Surface *tmpSurface;
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, *texID); // bind texture and set parameters
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		for (int i = 0;i < 6;i++)
+		{
+			// load file - using core SDL library
+			tmpSurface = SDL_LoadBMP(fname[i]);
+			if (!tmpSurface)
+			{
+				std::cout << "Error loading bitmap" << std::endl;
+				return *texID;
+			}
+
+			glTexImage2D(sides[i], 0, GL_RGB, tmpSurface->w, tmpSurface->h, 0,
+				GL_BGR, GL_UNSIGNED_BYTE, tmpSurface->pixels);
+			// texture loaded, free the temporary buffer
+			SDL_FreeSurface(tmpSurface);
+		}
+		return *texID;	// return value of texure ID, redundant really
+	}
+
 	//for later
 	GLuint loadBitmap(const char * fname)
 	{
@@ -119,6 +162,27 @@ namespace FurRenderingEngine {
 
 		SDL_FreeSurface(tmpSurface); // texture loaded, free the temporary buffer
 		return texID;	// return value of texture ID
+	}
+
+	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag)
+	{
+		//add skybox rendering code!!!
+
+		GLuint skyboxProg = rt3d::initShaders(skyboxVert, skyboxFrag);
+		shaders.insert({ SKYBOX, skyboxProg });
+
+		std::vector<GLfloat> verts;
+		std::vector<GLfloat> norms;
+		std::vector<GLfloat> tex_coords;
+		std::vector<GLuint> indices;
+
+		rt3d::loadObj("cube.obj", verts, norms, tex_coords, indices);
+
+		meshIndexCount = indices.size();
+
+		cube = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());;
+
+		loadCubeMap(fname, &skybox[0]);
 	}
 
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
@@ -259,15 +323,40 @@ namespace FurRenderingEngine {
 
 		t += 0.01f;
 
+		//skybox
+		{
+			glUseProgram(shaders.at(SKYBOX));
+			rt3d::setUniformMatrix4fv(shaders.at(SKYBOX), "projection", glm::value_ptr(projection));
+
+			glDepthMask(GL_FALSE); // make sure depth test is off
+			glm::mat3 mvRotOnlyMat3 = glm::mat3(mvStack.top());
+			mvStack.push(glm::mat4(mvRotOnlyMat3));
+
+			glCullFace(GL_FRONT);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skybox[0]);
+			mvStack.top() = glm::scale(mvStack.top(), glm::vec3(1.5f, 1.5f, 1.5f));
+			rt3d::setUniformMatrix4fv(shaders.at(SKYBOX), "modelview", glm::value_ptr(mvStack.top()));
+			rt3d::drawIndexedMesh(cube, meshIndexCount, GL_TRIANGLES);
+			mvStack.pop();
+
+			glCullFace(GL_FRONT);
+
+			glDepthMask(GL_TRUE);
+		}
+
+
 		for (auto m : models)
 		{
+			glUseProgram(m.second.getShaderProgram());
+
 			//this needs to be set once for every model every frame
 			int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "time");
 			glUniform1f(uniformIndex, sin(t));
 
 			for (int i = 0; i < num_layers; i++)
 			{
-				glUseProgram(m.second.getShaderProgram());
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
 
 				//this needs to be set for every layer

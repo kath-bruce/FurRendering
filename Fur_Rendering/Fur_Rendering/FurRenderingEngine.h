@@ -18,6 +18,8 @@ namespace FurRenderingEngine {
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
+	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag);
+
 	//use this after set the fur chance to generate a new texture using that fur chance
 	void regenTexture(std::string modelName);
 
