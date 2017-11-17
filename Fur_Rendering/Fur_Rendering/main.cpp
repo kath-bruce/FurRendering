@@ -118,7 +118,7 @@ void init()
 		//------------------ adding models with initialised shader
 
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
+			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false);
 
 		//------------------- adding skybox
 
