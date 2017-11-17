@@ -41,6 +41,11 @@ namespace FurRenderingEngine {
 	GLuint cube;
 	GLuint meshIndexCount;
 
+	//Lights
+	const unsigned int NUMBER_OF_LIGHTS = 11;
+	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
+	glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+
 	GLuint generateTexture()
 	{
 		GLuint texID;
@@ -332,7 +337,7 @@ namespace FurRenderingEngine {
 		shaders.insert({ shaderName, shaderProgram });
 	}
 
-	void setLight(std::string shaderName, rt3d::lightStruct light)
+	/*void setLight(std::string shaderName, rt3d::lightStruct light)
 	{
 		if (shaders.count(shaderName) < 1)
 		{
@@ -342,6 +347,31 @@ namespace FurRenderingEngine {
 
 		GLuint shaderProgram = shaders[shaderName];
 		rt3d::setLight(shaderProgram, light);
+	}*/
+
+	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber) {
+		// pass in light data to shader
+		std::string asString = std::to_string(lightNumber);
+		GLuint shader = shaders.at(shaderName);
+
+		glUseProgram(shader);
+
+		int uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].ambient").c_str());
+		glUniform4fv(uniformIndex, 1, light.ambient);
+		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].diffuse").c_str());
+		glUniform4fv(uniformIndex, 1, light.diffuse);
+		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].specular").c_str());
+		glUniform4fv(uniformIndex, 1, light.specular);
+	}
+
+	void setLightPos(std::string shaderName, const GLfloat *lightPos, const int lightNumber) {
+		//pass the light pos to the shader
+		GLuint shader = shaders.at(shaderName);
+
+		glUseProgram(shader);
+
+		int uniformIndex = glGetUniformLocation(shader, ("lightPosition[" + std::to_string(lightNumber) + "]").c_str());
+		glUniform4fv(uniformIndex, 1, lightPos);
 	}
 
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat)
@@ -353,6 +383,9 @@ namespace FurRenderingEngine {
 		}
 
 		GLuint shaderProgram = shaders[shaderName];
+
+		glUseProgram(shaderProgram);
+
 		rt3d::setMaterial(shaderProgram, mat);
 	}
 
@@ -365,6 +398,8 @@ namespace FurRenderingEngine {
 		}
 
 		GLuint shaderProgram = shaders[shaderName];
+
+		glUseProgram(shaderProgram);
 
 		lambda(shaderProgram);
 	}
@@ -470,6 +505,14 @@ namespace FurRenderingEngine {
 
 				mvStack.pop();
 			}
+		}
+
+		const unsigned int NUMBER_OF_LIGHTS = 11;
+		glUseProgram(shaders.at(LIGHT_SHADER));
+		rt3d::setUniformMatrix4fv(shaders.at(LIGHT_SHADER), "projection", glm::value_ptr(projection));
+		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
+			glm::vec4 tmp = mvStack.top()*lightPositions[i];
+			setLightPos(LIGHT_SHADER, glm::value_ptr(tmp), i);
 		}
 
 		// remember to use at least one pop operation per push...

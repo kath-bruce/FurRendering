@@ -15,6 +15,7 @@ namespace FurRenderingEngine {
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
 	#define FUR_TEXTURE_DIMENSION 512
+	#define LIGHT_SHADER "light_shader"
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
@@ -27,7 +28,8 @@ namespace FurRenderingEngine {
 		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping);
 
 	//set light - for later
-	void setLight(std::string shaderName, rt3d::lightStruct light);
+	//void setLight(std::string shaderName, rt3d::lightStruct light);
+	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber);
 
 	//set material - for later
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);

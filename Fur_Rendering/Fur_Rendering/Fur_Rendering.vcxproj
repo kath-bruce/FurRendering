@@ -159,6 +159,8 @@
     <None Include="cubeMap.vert" />
     <None Include="fur.frag" />
     <None Include="fur.vert" />
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="textured.frag" />
     <None Include="textured.vert" />
   </ItemGroup>
