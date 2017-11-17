@@ -92,6 +92,7 @@ void init()
 		}
 		);
 
+		//to be deprecated????
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
 			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
@@ -116,6 +117,24 @@ void init()
 		{
 			int uniformIndex = glGetUniformLocation(shader, "cutoffLayer");
 			glUniform1i(uniformIndex, cutoff_Layer);
+		}
+		);
+
+		//colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+		{
+			GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+			int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+			glUniform1i(uniformIndex, 0);
+
+			uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+			glUniform1i(uniformIndex, 1);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, colour_texture);
+			glActiveTexture(GL_TEXTURE0);
 		}
 		);
 

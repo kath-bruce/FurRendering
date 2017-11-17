@@ -21,6 +21,8 @@ namespace FurRenderingEngine {
 
 	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag);
 
+	GLuint loadBitmap(const char * fname);
+
 	//use this after set the fur chance to generate a new texture using that fur chance
 	void regenTexture(std::string modelName);
 
