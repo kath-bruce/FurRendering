@@ -15,19 +15,23 @@ namespace FurRenderingEngine {
 	#define SCREENWIDTH 800
 	#define SCREENHEIGHT 600
 	#define FUR_TEXTURE_DIMENSION 512
+	#define LIGHT_SHADER "light_shader"
 	
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
 	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag);
 
+	GLuint loadBitmap(const char * fname);
+
 	//use this after set the fur chance to generate a new texture using that fur chance
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
-		glm::vec3 scale, std::string modelName, std::string shaderName);
+		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping);
 
 	//set light - for later
-	void setLight(std::string shaderName, rt3d::lightStruct light);
+	//void setLight(std::string shaderName, rt3d::lightStruct light);
+	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber);
 
 	//set material - for later
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
@@ -49,5 +53,11 @@ namespace FurRenderingEngine {
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
+
+	//craigle
+	//void calculateTangents(std::vector<GLfloat> &tangents, std::vector<GLfloat> &verts, std::vector<GLfloat> &normals,
+		//std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices);
+
+	//void createNormalMappingVBO(std::string modelName);
 }
 

@@ -19,6 +19,15 @@ int grav_effect = 60;
 int layers = 60;
 int cutoffLayer = 20;
 
+//light related values
+const unsigned int NUMBER_OF_LIGHTS = 11;
+rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
+glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+// light attenuation
+float attConstant = 0.6f;
+float attLinear = 0.1f;
+float attQuadratic = 0.1f;
+
 //reference: http://www.xbdev.net/directx3dx/specialX/Fur/
 //reference: https://github.com/sdao/fur-demo
 //reference: https://stackoverflow.com/questions/12969971/is-it-possible-to-manually-create-image-data-for-opengl-texture-use
@@ -61,6 +70,7 @@ void init()
 	{
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
+		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 
 		//---------------- setting uniforms
 
@@ -82,6 +92,7 @@ void init()
 		}
 		);
 
+		//to be deprecated????
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
 			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
@@ -109,6 +120,34 @@ void init()
 		}
 		);
 
+		//colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+		{
+			GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+			int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+			glUniform1i(uniformIndex, 0);
+
+			uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+			glUniform1i(uniformIndex, 1);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, colour_texture);
+			glActiveTexture(GL_TEXTURE0);
+		}
+		);
+
+		glm::vec4 colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);   //sets the starting light colour
+		glm::vec4 pos = glm::vec4(0.0f, 2.0f, 0.0f, 1.0f);		// sets the starting light position
+		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
+			lights[i].ambient[0] = 0.1f; lights[i].ambient[1] = 0.0f; lights[i].ambient[2] = 0.0f; lights[i].ambient[3] = 1.0f;
+			lights[i].diffuse[0] = 1.0f; lights[i].diffuse[1] = 0.0f; lights[i].diffuse[2] = 0.0f; lights[i].diffuse[3] = 1.0f;
+			lights[i].specular[0] = 1.0f; lights[i].specular[1] = 0.0f; lights[i].specular[2] = 0.0f; lights[i].specular[3] = 1.0f;
+			lightPositions[i] = glm::vec4(10.0f, -10.0f, 10.0f, 0.0f);
+			FurRenderingEngine::setLight(LIGHT_SHADER, lights[i], i);
+		}
+
 		//---------------- setting fur rendering engine values
 
 		int num_layers = layers;
@@ -118,7 +157,7 @@ void init()
 		//------------------ adding models with initialised shader
 
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER);
+			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false);
 
 		//------------------- adding skybox
 

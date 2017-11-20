@@ -41,6 +41,11 @@ namespace FurRenderingEngine {
 	GLuint cube;
 	GLuint meshIndexCount;
 
+	//Lights
+	const unsigned int NUMBER_OF_LIGHTS = 11;
+	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
+	glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+
 	GLuint generateTexture()
 	{
 		GLuint texID;
@@ -185,7 +190,79 @@ namespace FurRenderingEngine {
 		loadCubeMap(fname, &skybox[0]);
 	}
 
-	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName)
+	void calculateTangents(std::vector<GLfloat> &tangents, std::vector<GLfloat> &verts, std::vector<GLfloat> &normals,
+		std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices) {
+
+		// Code taken from http://www.terathon.com/code/tangent.html and modified slightly to use vectors instead of arrays
+		// Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software 3D Graphics Library, 2001. 
+
+		// This is a little messy because my vectors are of type GLfloat:
+		// should have made them glm::vec2 and glm::vec3 - life, would be much easier!
+
+		std::vector<glm::vec3> tan1(verts.size() / 3, glm::vec3(0.0f));
+		std::vector<glm::vec3> tan2(verts.size() / 3, glm::vec3(0.0f));
+		int triCount = indices.size() / 3;
+		for (int c = 0; c < indices.size(); c += 3)
+		{
+			int i1 = indices[c];
+			int i2 = indices[c + 1];
+			int i3 = indices[c + 2];
+
+			glm::vec3 v1(verts[i1 * 3], verts[i1 * 3 + 1], verts[i1 * 3 + 2]);
+			glm::vec3 v2(verts[i2 * 3], verts[i2 * 3 + 1], verts[i2 * 3 + 2]);
+			glm::vec3 v3(verts[i3 * 3], verts[i3 * 3 + 1], verts[i3 * 3 + 2]);
+
+			glm::vec2 w1(tex_coords[i1 * 2], tex_coords[i1 * 2 + 1]);
+			glm::vec2 w2(tex_coords[i2 * 2], tex_coords[i2 * 2 + 1]);
+			glm::vec2 w3(tex_coords[i3 * 2], tex_coords[i3 * 2 + 1]);
+
+			float x1 = v2.x - v1.x;
+			float x2 = v3.x - v1.x;
+			float y1 = v2.y - v1.y;
+			float y2 = v3.y - v1.y;
+			float z1 = v2.z - v1.z;
+			float z2 = v3.z - v1.z;
+
+			float s1 = w2.x - w1.x;
+			float s2 = w3.x - w1.x;
+			float t1 = w2.y - w1.y;
+			float t2 = w3.y - w1.y;
+
+			float r = 1.0F / (s1 * t2 - s2 * t1);
+			glm::vec3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+				(t2 * z1 - t1 * z2) * r);
+			glm::vec3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+				(s1 * z2 - s2 * z1) * r);
+
+			tan1[i1] += sdir;
+			tan1[i2] += sdir;
+			tan1[i3] += sdir;
+
+			tan2[i1] += tdir;
+			tan2[i2] += tdir;
+			tan2[i3] += tdir;
+		}
+
+		for (int a = 0; a < verts.size(); a += 3)
+		{
+			glm::vec3 n(normals[a], normals[a + 1], normals[a + 2]);
+			glm::vec3 t = tan1[a / 3];
+
+			glm::vec3 tangent;
+			tangent = (t - n * glm::normalize(glm::dot(n, t)));
+
+			// handedness
+			GLfloat w = (glm::dot(glm::cross(n, t), tan2[a / 3]) < 0.0f) ? -1.0f : 1.0f;
+
+			tangents.push_back(tangent.x);
+			tangents.push_back(tangent.y);
+			tangents.push_back(tangent.z);
+			tangents.push_back(w);
+
+		}
+	}
+
+	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping)
 	{
 		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
 		if (shaders.count(shaderName) < 1)
@@ -214,6 +291,23 @@ namespace FurRenderingEngine {
 		GLuint meshIndexCount = indices.size();
 
 		GLuint modelObj = rt3d::createMesh(verts.size() / 3, verts.data(), nullptr, norms.data(), tex_coords.data(), meshIndexCount, indices.data());
+
+		if (hasNormalMapping)
+		{
+			std::vector<GLfloat> tangents;
+			calculateTangents(tangents, verts, norms, tex_coords, indices);
+			// And add the tangent data
+			glBindVertexArray(modelObj);
+			GLuint VBO;
+			glGenBuffers(1, &VBO);
+			// VBO for tangent data
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, tangents.size() * sizeof(GLfloat), tangents.data(), GL_STATIC_DRAW);
+			glVertexAttribPointer((GLuint)5, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glEnableVertexAttribArray(5);
+			glBindVertexArray(0);
+		}
+
 		GLuint texture = generateTexture();
 
 		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram)));
@@ -243,7 +337,7 @@ namespace FurRenderingEngine {
 		shaders.insert({ shaderName, shaderProgram });
 	}
 
-	void setLight(std::string shaderName, rt3d::lightStruct light)
+	/*void setLight(std::string shaderName, rt3d::lightStruct light)
 	{
 		if (shaders.count(shaderName) < 1)
 		{
@@ -253,6 +347,31 @@ namespace FurRenderingEngine {
 
 		GLuint shaderProgram = shaders[shaderName];
 		rt3d::setLight(shaderProgram, light);
+	}*/
+
+	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber) {
+		// pass in light data to shader
+		std::string asString = std::to_string(lightNumber);
+		GLuint shader = shaders.at(shaderName);
+
+		glUseProgram(shader);
+
+		int uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].ambient").c_str());
+		glUniform4fv(uniformIndex, 1, light.ambient);
+		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].diffuse").c_str());
+		glUniform4fv(uniformIndex, 1, light.diffuse);
+		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].specular").c_str());
+		glUniform4fv(uniformIndex, 1, light.specular);
+	}
+
+	void setLightPos(std::string shaderName, const GLfloat *lightPos, const int lightNumber) {
+		//pass the light pos to the shader
+		GLuint shader = shaders.at(shaderName);
+
+		glUseProgram(shader);
+
+		int uniformIndex = glGetUniformLocation(shader, ("lightPosition[" + std::to_string(lightNumber) + "]").c_str());
+		glUniform4fv(uniformIndex, 1, lightPos);
 	}
 
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat)
@@ -264,6 +383,9 @@ namespace FurRenderingEngine {
 		}
 
 		GLuint shaderProgram = shaders[shaderName];
+
+		glUseProgram(shaderProgram);
+
 		rt3d::setMaterial(shaderProgram, mat);
 	}
 
@@ -276,6 +398,8 @@ namespace FurRenderingEngine {
 		}
 
 		GLuint shaderProgram = shaders[shaderName];
+
+		glUseProgram(shaderProgram);
 
 		lambda(shaderProgram);
 	}
@@ -383,6 +507,14 @@ namespace FurRenderingEngine {
 			}
 		}
 
+		const unsigned int NUMBER_OF_LIGHTS = 11;
+		glUseProgram(shaders.at(LIGHT_SHADER));
+		rt3d::setUniformMatrix4fv(shaders.at(LIGHT_SHADER), "projection", glm::value_ptr(projection));
+		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
+			glm::vec4 tmp = mvStack.top()*lightPositions[i];
+			setLightPos(LIGHT_SHADER, glm::value_ptr(tmp), i);
+		}
+
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
 
@@ -415,4 +547,19 @@ namespace FurRenderingEngine {
 	{
 		fur_chance = fur_c;
 	}
+
+	
+
+	/*void createNormalMappingVBO(std::string modelName)
+	{
+		std::vector<GLfloat> tangents;
+		std::vector<GLfloat> verts;
+		std::vector<GLfloat> norms;
+		std::vector<GLfloat> tex_coords;
+		std::vector<GLuint> indices;
+
+		calculateTangents(tangents, verts, norms, tex_coords, indices);
+
+
+	}*/
 }

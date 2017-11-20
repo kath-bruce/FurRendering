@@ -4,9 +4,14 @@
 // Some drivers require the following
 precision highp float;
 
+//fur texture
 uniform sampler2D textureUnit0;
+
+//colour texture
+uniform sampler2D textureUnit1;
+
 uniform int cutoffLayer; 
-uniform vec4 fur_colour;
+uniform vec4 fur_colour; //to be deprecated????
 
 in vec2 ex_TexCoord;
 in float ex_fragLayer;
@@ -21,7 +26,7 @@ void main(void) {
 	//increasing the divisor in the third parameter will lighten the shadow
 	//in smaller increments, effectively making the fur darker
 	float fakeShadow = mix(0.4, 1.0, (ex_fragLayer/15.0));
-	vec4 furColour = fur_colour * fakeShadow;
+	vec4 furColour = texture(textureUnit1, ex_TexCoord) * fakeShadow;
 
 	vec4 furData = texture(textureUnit0, ex_TexCoord);
 
