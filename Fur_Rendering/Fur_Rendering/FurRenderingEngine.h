@@ -11,12 +11,14 @@
 #include "Model.h"
 
 namespace FurRenderingEngine {
-	#define DEG_TO_RADIAN 0.017453293
-	#define SCREENWIDTH 800
-	#define SCREENHEIGHT 600
-	#define FUR_TEXTURE_DIMENSION 512
-	#define LIGHT_SHADER "light_shader"
-	
+#define DEG_TO_RADIAN 0.017453293
+#define SCREENWIDTH 800
+#define SCREENHEIGHT 600
+#define FUR_TEXTURE_DIMENSION 512
+#define LIGHT_SHADER "light_shader"
+#define NORMAL_SHADER "normal_shader"
+#define TEST_SHADER "test_shader"
+
 	void addShader(std::string shaderName, const char * vert, const char * frag);
 
 	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag);
@@ -37,7 +39,7 @@ namespace FurRenderingEngine {
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
 
 	//set uniform for a shader - specific type of uniform is set in the lambda
-	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda); 
+	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda);
 
 	//increases model rotation by rotX, rotY and rotZ
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
@@ -56,7 +58,7 @@ namespace FurRenderingEngine {
 
 	//craigle
 	//void calculateTangents(std::vector<GLfloat> &tangents, std::vector<GLfloat> &verts, std::vector<GLfloat> &normals,
-		//std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices);
+	//std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices);
 
 	//void createNormalMappingVBO(std::string modelName);
 }

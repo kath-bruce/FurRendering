@@ -4,7 +4,7 @@
 #include <string>
 #include <stack>
 namespace FurRenderingEngine {
-	#define SKYBOX "skybox"
+#define SKYBOX "skybox"
 
 	//shader
 	std::unordered_map<std::string, GLuint> shaders;
@@ -111,7 +111,7 @@ namespace FurRenderingEngine {
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		for (int i = 0;i < 6;i++)
+		for (int i = 0; i < 6; i++)
 		{
 			// load file - using core SDL library
 			tmpSurface = SDL_LoadBMP(fname[i]);
@@ -339,14 +339,14 @@ namespace FurRenderingEngine {
 
 	/*void setLight(std::string shaderName, rt3d::lightStruct light)
 	{
-		if (shaders.count(shaderName) < 1)
-		{
-			std::cout << "ERROR (setLight): " << shaderName << " has not been initialised!\n";
-			return;
-		}
+	if (shaders.count(shaderName) < 1)
+	{
+	std::cout << "ERROR (setLight): " << shaderName << " has not been initialised!\n";
+	return;
+	}
 
-		GLuint shaderProgram = shaders[shaderName];
-		rt3d::setLight(shaderProgram, light);
+	GLuint shaderProgram = shaders[shaderName];
+	rt3d::setLight(shaderProgram, light);
 	}*/
 
 	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber) {
@@ -548,17 +548,17 @@ namespace FurRenderingEngine {
 		fur_chance = fur_c;
 	}
 
-	
+
 
 	/*void createNormalMappingVBO(std::string modelName)
 	{
-		std::vector<GLfloat> tangents;
-		std::vector<GLfloat> verts;
-		std::vector<GLfloat> norms;
-		std::vector<GLfloat> tex_coords;
-		std::vector<GLuint> indices;
+	std::vector<GLfloat> tangents;
+	std::vector<GLfloat> verts;
+	std::vector<GLfloat> norms;
+	std::vector<GLfloat> tex_coords;
+	std::vector<GLuint> indices;
 
-		calculateTangents(tangents, verts, norms, tex_coords, indices);
+	calculateTangents(tangents, verts, norms, tex_coords, indices);
 
 
 	}*/

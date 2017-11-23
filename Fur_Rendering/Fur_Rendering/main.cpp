@@ -12,6 +12,7 @@
 
 #define FUR_SHADER "fur_Shader"
 #define FUR_OBJ "fur_Obj"
+#define CUBE_OBJ "cube_Obj"
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -71,6 +72,12 @@ void init()
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
+
+		//Normal Mapping shader
+		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
+
+		//Quick test shader
+		FurRenderingEngine::addShader(TEST_SHADER, "textured.vert", "textured.frag");
 
 		//---------------- setting uniforms
 
@@ -148,7 +155,7 @@ void init()
 			FurRenderingEngine::setLight(LIGHT_SHADER, lights[i], i);
 		}
 
-		//---------------- setting fur rendering engine values
+		//------------------ setting fur rendering engine values
 
 		int num_layers = layers;
 
@@ -159,7 +166,7 @@ void init()
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
 			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false);
 
-		//------------------- adding skybox
+		//------------------ adding skybox
 
 		const char *cubeTexFiles[6] = {
 			"town-skybox/Town_bk.bmp", "town-skybox/Town_ft.bmp",
@@ -168,6 +175,9 @@ void init()
 		};
 
 		FurRenderingEngine::addSkybox(cubeTexFiles, "cubeMap.vert", "cubeMap.frag");
+
+		//------------------ adding cube
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, -2.1f), glm::vec3(0.5f, 0.5f, 0.5f), CUBE_OBJ, TEST_SHADER, false);
 	}
 }
 
