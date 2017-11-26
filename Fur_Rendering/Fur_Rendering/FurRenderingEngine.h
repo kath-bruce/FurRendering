@@ -27,7 +27,7 @@ namespace FurRenderingEngine {
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
-		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping);
+		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping, const char * textureFileName);
 
 	//set light - for later
 	//void setLight(std::string shaderName, rt3d::lightStruct light);
@@ -41,6 +41,12 @@ namespace FurRenderingEngine {
 
 	//increases model rotation by rotX, rotY and rotZ
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
+
+	//changes model position
+	void updateModelPos(std::string modelName, GLfloat diffX, GLfloat diffY, GLfloat diffZ);
+
+	//zoom to model
+	void zoomToModel(std::string modelName, GLfloat zoomFactor);
 
 	//this draws all the models that have been added
 	void draw();
