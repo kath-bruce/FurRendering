@@ -43,6 +43,13 @@ namespace FurRenderingEngine {
 	GLuint cube;
 	GLuint meshIndexCount;
 
+	//Light test for Normal Map
+	// light attenuation
+	float attConstant = 1.0f;
+	float attLinear = 0.0f;
+	float attQuadratic = 0.0f;
+	float theta = 0.0f;
+
 	//Lights
 	const unsigned int NUMBER_OF_LIGHTS = 11;
 	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
@@ -535,6 +542,13 @@ namespace FurRenderingEngine {
 
 		glm::mat4 modelview(1.0); // set base position for scene
 		mvStack.push(modelview);
+
+		//Independently calculate the model matrix from the view for normal mapping
+		glm::mat4 modelMatrix(1.0);
+		mvStack.push(mvStack.top());
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2.0f, 1.0f, -3.0f));
+		modelMatrix = glm::rotate(modelMatrix, float(theta*DEG_TO_RADIAN), glm::vec3(1.0f, 1.0f, 1.0f));//transform theta to radians if expressed in degrees
+		mvStack.top() = mvStack.top() * modelMatrix;
 
 		//at = moveForward(eye, 0.0f, 1.0f);
 

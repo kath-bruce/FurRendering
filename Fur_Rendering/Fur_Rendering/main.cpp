@@ -14,6 +14,8 @@
 #define FUR_OBJ "fur_Obj"
 #define PLANE_SHADER "plane_Shader"
 #define PLANE_OBJ "plane_Obj"
+#define NORMAL_SHADER "normal_Shader"
+#define NORMAL_OBJ "normal_Obj"
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -74,6 +76,7 @@ void init()
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
+		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
 
 		//---------------- setting uniforms
 
@@ -141,6 +144,26 @@ void init()
 		}
 		);
 
+		//---------------- setting normal mapping uniforms
+		FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader) 
+		{
+			GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
+
+			int uniformIndex = glGetUniformLocation(shader, "texMap");
+			glUniform1i(uniformIndex, 0);
+
+			uniformIndex = glGetUniformLocation(shader, "normalMap");
+			glUniform1i(uniformIndex, 1);
+
+			uniformIndex = glGetUniformLocation(shader, "attConst");
+			glUniform1f(uniformIndex, attConstant);
+			uniformIndex = glGetUniformLocation(shader, "attLinear");
+			glUniform1f(uniformIndex, attLinear);
+			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+			glUniform1f(uniformIndex, attQuadratic);
+		}
+		);
+
 		glm::vec4 colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);   //sets the starting light colour
 		glm::vec4 pos = glm::vec4(0.0f, 2.0f, 0.0f, 1.0f);		// sets the starting light position
 		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
@@ -164,6 +187,9 @@ void init()
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp");
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap");
 
 		//------------------- adding skybox
 
@@ -192,22 +218,6 @@ void update(SDL_Event sdlEvent)
 		{
 			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 		}
-		/*if (keys[SDL_SCANCODE_UP])
-		{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
-		}
-		if (keys[SDL_SCANCODE_DOWN])
-		{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
-		}
-		if (keys[SDL_SCANCODE_LEFT])
-		{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
-		}
-		if (keys[SDL_SCANCODE_RIGHT])
-		{
-		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
-		}*/
 
 		//-------------- movement
 		if (keys[SDL_SCANCODE_W])
