@@ -18,9 +18,11 @@ namespace FurRenderingEngine {
 	//eye	- camera
 	//at	- point camera initially faces
 	//up	- unit up vector
-	glm::vec3 eye(0.0f, 1.0f, 0.0f);
-	glm::vec3 at(0.0f, 1.0f, -1.0f);
+	glm::vec3 eye(0.0f, 5.0f, 5.0f);
+	//glm::vec3 at(0.0f, 1.0f, -3.0f);
+	glm::vec3 at(0.0f, 1.0f, -3.0f);
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
+	glm::vec3 camDiff(0.0f, 5.0f, 5.0f);
 
 	//projection
 	glm::mat4 projection = glm::perspective(float(60.0f*DEG_TO_RADIAN), (float)SCREENWIDTH / (float)SCREENHEIGHT, 1.0f, 150.0f);
@@ -262,7 +264,8 @@ namespace FurRenderingEngine {
 		}
 	}
 
-	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping)
+	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, 
+		std::string shaderName, bool hasNormalMapping, const char * textureFileName)
 	{
 		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
 		if (shaders.count(shaderName) < 1)
@@ -308,7 +311,16 @@ namespace FurRenderingEngine {
 			glBindVertexArray(0);
 		}
 
-		GLuint texture = generateTexture();
+		GLuint texture;
+
+		if (textureFileName == "")
+		{
+			texture = generateTexture();
+		}
+		else
+		{
+			texture = loadBitmap(textureFileName);
+		}
 
 		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram)));
 
@@ -404,6 +416,16 @@ namespace FurRenderingEngine {
 		lambda(shaderProgram);
 	}
 
+	//for later
+	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
+		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
+	}
+
+	//for later
+	glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
+		return glm::vec3(pos.x + d*std::cos(angle*DEG_TO_RADIAN), pos.y, pos.z + d*std::sin(angle*DEG_TO_RADIAN));
+	}
+
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
 
@@ -421,16 +443,88 @@ namespace FurRenderingEngine {
 
 		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
+
+		//at = m.getPos(); //at is position of player
+		/*eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
+			at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
+		//eye = at;
+		//eye.y += 1.5f;
 	}
 
-	//for later
-	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
-		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
+	void updateModelPos(std::string modelName, GLfloat diffX, GLfloat diffY, GLfloat diffZ)
+	{
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (updateModelPos): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+
+		glm::vec3 newPos(m.getPos().x + diffX, m.getPos().y + diffY, m.getPos().z + diffZ);
+		m.setPos(newPos);
+
+		//use move forward and move right?????
+
+		/*if (diffZ != 0)
+		{
+			m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
+		}
+		if (diffX != 0)
+		{
+			m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
+		}*/
+
+		//this is to ensure the model with the new rotation is the only version of the model
+		models.insert_or_assign(modelName, m);
+
+		//eye = glm::vec3(at.x + (-8.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
+			//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+		//eye.y += 3.0;
+
+		
+		at = m.getPos(); //at is position of player
+
+		//eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
+			//at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+		//eye = at;
+		//eye.y += 1.5f;
+		//mvStack.top() = glm::lookAt(eye, at, up);
 	}
 
-	//for later
-	glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
-		return glm::vec3(pos.x + d*std::cos(angle*DEG_TO_RADIAN), pos.y, pos.z + d*std::sin(angle*DEG_TO_RADIAN));
+	void zoomToModel(std::string modelName, GLfloat zoomFactor)
+	{
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (zoomToModel): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+
+		if (zoomFactor < 0.0f)
+		{
+			if (camDiff.y > 0.0f)
+			{
+				camDiff.y += zoomFactor;
+			}
+			else if (camDiff.z > 2.5f)
+			{
+				camDiff.z += zoomFactor;
+			}
+		}
+		else
+		{
+			if (camDiff.z < 5.0f)
+			{
+				camDiff.z += zoomFactor;
+			}
+			else if (camDiff.y < 5.0f)
+			{
+				camDiff.y += zoomFactor;
+			}
+		}
+		//eye
 	}
 
 	void draw()
@@ -442,7 +536,9 @@ namespace FurRenderingEngine {
 		glm::mat4 modelview(1.0); // set base position for scene
 		mvStack.push(modelview);
 
-		at = moveForward(eye, 0.0f, 1.0f);
+		//at = moveForward(eye, 0.0f, 1.0f);
+
+		eye = at + camDiff;
 		mvStack.top() = glm::lookAt(eye, at, up);
 
 		t += 0.01f;

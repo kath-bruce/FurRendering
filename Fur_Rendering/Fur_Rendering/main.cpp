@@ -12,7 +12,12 @@
 
 #define FUR_SHADER "fur_Shader"
 #define FUR_OBJ "fur_Obj"
+<<<<<<< HEAD
 #define CUBE_OBJ "cube_Obj"
+=======
+#define PLANE_SHADER "plane_Shader"
+#define PLANE_OBJ "plane_Obj"
+>>>>>>> upstream/master
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -72,6 +77,7 @@ void init()
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
+		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
 
 		//Normal Mapping shader
 		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
@@ -163,8 +169,11 @@ void init()
 
 		//------------------ adding models with initialised shader
 
-		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -2.1f),
-			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false);
+		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false, "");
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp");
 
 		//------------------ adding skybox
 
@@ -190,13 +199,13 @@ void update(SDL_Event sdlEvent)
 		//-------- rotating around each axis
 		if (keys[SDL_SCANCODE_COMMA])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
 		}
 		if (keys[SDL_SCANCODE_PERIOD])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, -1.5f, 0.0f);
+			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 1.5f, 0.0f);
 		}
-		if (keys[SDL_SCANCODE_UP])
+		/*if (keys[SDL_SCANCODE_UP])
 		{
 			FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 		}
@@ -211,6 +220,34 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_RIGHT])
 		{
 			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
+		}*/
+
+		//-------------- movement
+		if (keys[SDL_SCANCODE_W])
+		{
+			FurRenderingEngine::updateModelPos(FUR_OBJ, 0.0f, 0.0f, -0.1f);
+		}
+		if (keys[SDL_SCANCODE_S])
+		{
+			FurRenderingEngine::updateModelPos(FUR_OBJ, 0.0f, 0.0f, 0.1f);
+		}
+		if (keys[SDL_SCANCODE_A])
+		{
+			FurRenderingEngine::updateModelPos(FUR_OBJ, -0.1f, 0.0f, 0.0f);
+		}
+		if (keys[SDL_SCANCODE_D])
+		{
+			FurRenderingEngine::updateModelPos(FUR_OBJ, 0.1f, 0.0f, 0.0f);
+		}
+
+		//----------- camera controls
+		if (keys[SDL_SCANCODE_Z])
+		{
+			FurRenderingEngine::zoomToModel(FUR_OBJ, 0.1f);
+		}
+		if (keys[SDL_SCANCODE_X])
+		{
+			FurRenderingEngine::zoomToModel(FUR_OBJ, -0.1f);
 		}
 
 		//------------ regenerating fur texture 
