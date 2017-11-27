@@ -40,6 +40,11 @@ void main(void) {
 	//this is to decrease alpha based on layer and by how much
 	visibility = visibility - (ex_fragLayer/100.0);
 
+	if (visibility <= 0)
+	{
+		discard;
+	}
+
 	furColour.a = visibility;
 
 	out_Color = furColour;
