@@ -12,12 +12,8 @@
 
 #define FUR_SHADER "fur_Shader"
 #define FUR_OBJ "fur_Obj"
-<<<<<<< HEAD
-#define CUBE_OBJ "cube_Obj"
-=======
 #define PLANE_SHADER "plane_Shader"
 #define PLANE_OBJ "plane_Obj"
->>>>>>> upstream/master
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -78,12 +74,6 @@ void init()
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
 		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
-
-		//Normal Mapping shader
-		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
-
-		//Quick test shader
-		FurRenderingEngine::addShader(TEST_SHADER, "textured.vert", "textured.frag");
 
 		//---------------- setting uniforms
 
@@ -161,7 +151,7 @@ void init()
 			FurRenderingEngine::setLight(LIGHT_SHADER, lights[i], i);
 		}
 
-		//------------------ setting fur rendering engine values
+		//---------------- setting fur rendering engine values
 
 		int num_layers = layers;
 
@@ -175,7 +165,7 @@ void init()
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp");
 
-		//------------------ adding skybox
+		//------------------- adding skybox
 
 		const char *cubeTexFiles[6] = {
 			"town-skybox/Town_bk.bmp", "town-skybox/Town_ft.bmp",
@@ -184,9 +174,6 @@ void init()
 		};
 
 		FurRenderingEngine::addSkybox(cubeTexFiles, "cubeMap.vert", "cubeMap.frag");
-
-		//------------------ adding cube
-		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, -2.1f), glm::vec3(0.5f, 0.5f, 0.5f), CUBE_OBJ, TEST_SHADER, false);
 	}
 }
 
@@ -207,19 +194,19 @@ void update(SDL_Event sdlEvent)
 		}
 		/*if (keys[SDL_SCANCODE_UP])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 1.5f, 0.0f, 0.0f);
 		}
 		if (keys[SDL_SCANCODE_DOWN])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, -1.5f, 0.0f, 0.0f);
 		}
 		if (keys[SDL_SCANCODE_LEFT])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, 1.5f);
 		}
 		if (keys[SDL_SCANCODE_RIGHT])
 		{
-			FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
+		FurRenderingEngine::updateModelRot(FUR_OBJ, 0.0f, 0.0f, -1.5f);
 		}*/
 
 		//-------------- movement

@@ -264,7 +264,7 @@ namespace FurRenderingEngine {
 		}
 	}
 
-	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, 
+	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName,
 		std::string shaderName, bool hasNormalMapping, const char * textureFileName)
 	{
 		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
@@ -446,7 +446,7 @@ namespace FurRenderingEngine {
 
 		//at = m.getPos(); //at is position of player
 		/*eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
+		at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
 		//eye = at;
 		//eye.y += 1.5f;
 	}
@@ -468,28 +468,28 @@ namespace FurRenderingEngine {
 
 		/*if (diffZ != 0)
 		{
-			m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
+		m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
 		}
 		if (diffX != 0)
 		{
-			m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
+		m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
 		}*/
 
 		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
 
 		//eye = glm::vec3(at.x + (-8.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+		//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
 		//eye.y += 3.0;
 
-		
+
 		at = m.getPos(); //at is position of player
 
-		//eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			//at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
-		//eye = at;
-		//eye.y += 1.5f;
-		//mvStack.top() = glm::lookAt(eye, at, up);
+						 //eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
+						 //at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+						 //eye = at;
+						 //eye.y += 1.5f;
+						 //mvStack.top() = glm::lookAt(eye, at, up);
 	}
 
 	void zoomToModel(std::string modelName, GLfloat zoomFactor)
