@@ -43,10 +43,34 @@ namespace FurRenderingEngine {
 	GLuint cube;
 	GLuint meshIndexCount;
 
+	//Light test for Normal Map
+	// light attenuation
+	float attConstant = 1.0f;
+	float attLinear = 0.0f;
+	float attQuadratic = 0.0f;
+	float theta = 0.0f;
+
 	//Lights
 	const unsigned int NUMBER_OF_LIGHTS = 11;
 	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
 	glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+
+	//Temporary normal map light
+	rt3d::lightStruct light0 = {
+		{ 0.4f, 0.4f, 0.4f, 1.0f }, // ambient
+		{ 1.0f, 1.0f, 1.0f, 1.0f }, // diffuse
+		{ 1.0f, 1.0f, 1.0f, 1.0f }, // specular
+		{ -5.0f, 2.0f, 2.0f, 1.0f }  // position
+	};
+	glm::vec4 lightPos(-5.0f, 2.0f, 2.0f, 1.0f); //light position
+
+	//Temporary normal map material
+	rt3d::materialStruct material1 = {
+		{ 0.4f, 0.4f, 1.0f, 1.0f }, // ambient
+		{ 0.8f, 0.8f, 1.0f, 1.0f }, // diffuse
+		{ 0.8f, 0.8f, 0.8f, 1.0f }, // specular
+		1.0f  // shininess
+	};
 
 	GLuint generateTexture()
 	{
@@ -196,7 +220,7 @@ namespace FurRenderingEngine {
 		std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices) {
 
 		// Code taken from http://www.terathon.com/code/tangent.html and modified slightly to use vectors instead of arrays
-		// Lengyel, Eric. ìComputing Tangent Space Basis Vectors for an Arbitrary Meshî. Terathon Software 3D Graphics Library, 2001. 
+		// Lengyel, Eric. ‚ÄúComputing Tangent Space Basis Vectors for an Arbitrary Mesh‚Äù. Terathon Software 3D Graphics Library, 2001. 
 
 		// This is a little messy because my vectors are of type GLfloat:
 		// should have made them glm::vec2 and glm::vec3 - life, would be much easier!
@@ -355,14 +379,14 @@ namespace FurRenderingEngine {
 
 	/*void setLight(std::string shaderName, rt3d::lightStruct light)
 	{
-		if (shaders.count(shaderName) < 1)
-		{
-			std::cout << "ERROR (setLight): " << shaderName << " has not been initialised!\n";
-			return;
-		}
+	if (shaders.count(shaderName) < 1)
+	{
+	std::cout << "ERROR (setLight): " << shaderName << " has not been initialised!\n";
+	return;
+	}
 
-		GLuint shaderProgram = shaders[shaderName];
-		rt3d::setLight(shaderProgram, light);
+	GLuint shaderProgram = shaders[shaderName];
+	rt3d::setLight(shaderProgram, light);
 	}*/
 
 	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber) {
@@ -450,7 +474,7 @@ namespace FurRenderingEngine {
 
 		//at = m.getPos(); //at is position of player
 		/*eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
+		at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
 		//eye = at;
 		//eye.y += 1.5f;
 	}
@@ -472,28 +496,28 @@ namespace FurRenderingEngine {
 
 		/*if (diffZ != 0)
 		{
-			m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
+		m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
 		}
 		if (diffX != 0)
 		{
-			m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
+		m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
 		}*/
 
 		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
 
 		//eye = glm::vec3(at.x + (-8.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+		//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
 		//eye.y += 3.0;
 
-		
+
 		at = m.getPos(); //at is position of player
 
-		//eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-			//at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
-		//eye = at;
-		//eye.y += 1.5f;
-		//mvStack.top() = glm::lookAt(eye, at, up);
+						 //eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
+						 //at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
+						 //eye = at;
+						 //eye.y += 1.5f;
+						 //mvStack.top() = glm::lookAt(eye, at, up);
 	}
 
 	void zoomToModel(std::string modelName, GLfloat zoomFactor)
@@ -540,12 +564,24 @@ namespace FurRenderingEngine {
 		glm::mat4 modelview(1.0); // set base position for scene
 		mvStack.push(modelview);
 
+		//Independently calculate the model matrix from the view for normal mapping
+		glm::mat4 modelMatrix(1.0);
+		mvStack.push(mvStack.top());
+		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2.0f, 1.0f, -3.0f));
+		modelMatrix = glm::rotate(modelMatrix, float(theta*DEG_TO_RADIAN), glm::vec3(1.0f, 1.0f, 1.0f));//transform theta to radians if expressed in degrees
+		mvStack.top() = mvStack.top() * modelMatrix;
+
 		//at = moveForward(eye, 0.0f, 1.0f);
 
 		eye = at + camDiff;
 		mvStack.top() = glm::lookAt(eye, at, up);
 
 		t += 0.01f;
+
+		glm::vec4 tmp = mvStack.top()*lightPos;
+		light0.position[0] = tmp.x;
+		light0.position[1] = tmp.y;
+		light0.position[2] = tmp.z;
 
 		//skybox
 		{
@@ -587,6 +623,12 @@ namespace FurRenderingEngine {
 				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
 				glUniform1f(uniformIndex, i);
 
+				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "cameraPos");
+				glUniform3fv(uniformIndex, 1, glm::value_ptr(eye));
+				//Testing stuff
+				rt3d::setLight(m.second.getShaderProgram(), light0);
+				rt3d::setMaterial(m.second.getShaderProgram(), material1);
+
 				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
 				mvStack.push(mvStack.top());
@@ -599,7 +641,13 @@ namespace FurRenderingEngine {
 
 				mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
 
+				rt3d::setLightPos(m.second.getShaderProgram(), glm::value_ptr(tmp));
+
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
+
+				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelMatrix", glm::value_ptr(mvStack.top()));
+
+
 
 				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
 
@@ -664,13 +712,13 @@ namespace FurRenderingEngine {
 
 	/*void createNormalMappingVBO(std::string modelName)
 	{
-		std::vector<GLfloat> tangents;
-		std::vector<GLfloat> verts;
-		std::vector<GLfloat> norms;
-		std::vector<GLfloat> tex_coords;
-		std::vector<GLuint> indices;
+	std::vector<GLfloat> tangents;
+	std::vector<GLfloat> verts;
+	std::vector<GLfloat> norms;
+	std::vector<GLfloat> tex_coords;
+	std::vector<GLuint> indices;
 
-		calculateTangents(tangents, verts, norms, tex_coords, indices);
+	calculateTangents(tangents, verts, norms, tex_coords, indices);
 
 
 	}*/
