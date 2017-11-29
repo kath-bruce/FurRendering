@@ -31,7 +31,7 @@ namespace FurRenderingEngine {
 	float t = 0.0f;
 
 	//default value of one to ensure the models are rendered at least once
-	int num_layers = 1;
+	//int num_layers = 1;
 
 	//used during fur texture generation
 	int fur_chance = 30;
@@ -265,7 +265,7 @@ namespace FurRenderingEngine {
 	}
 
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, 
-		std::string shaderName, bool hasNormalMapping, const char * textureFileName)
+		std::string shaderName, bool hasNormalMapping, const char * textureFileName, int num_layers)
 	{
 		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
 		if (shaders.count(shaderName) < 1)
@@ -322,7 +322,11 @@ namespace FurRenderingEngine {
 			texture = loadBitmap(textureFileName);
 		}
 
-		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram)));
+		//auto modelLayerPair = std::make_pair(Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram), num_layers);
+
+		//models.emplace(std::make_pair(modelName, modelLayerPair));
+		//models[modelName] = modelLayerPair;
+		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram, num_layers)));
 
 	}
 
@@ -575,7 +579,7 @@ namespace FurRenderingEngine {
 			int uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "time");
 			glUniform1f(uniformIndex, sin(t));
 
-			for (int i = 0; i < num_layers; i++)
+			for (int i = 0; i < m.second.getNumLayers(); i++)
 			{
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
 
@@ -634,9 +638,21 @@ namespace FurRenderingEngine {
 		models.insert_or_assign(modelName, m);
 	}
 
-	void setNumLayers(int num_l)
+	void setNumLayers(std::string modelName, int num_l)
 	{
-		num_layers = num_l;
+		//num_layers = num_l;
+
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (setNumLayers): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+
+		m.setNumLayers(num_l);
+
+		models.insert_or_assign(modelName, m);
 	}
 
 	void setFurChance(int fur_c)

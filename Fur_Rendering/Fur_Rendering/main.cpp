@@ -153,17 +153,17 @@ void init()
 
 		//---------------- setting fur rendering engine values
 
-		int num_layers = layers;
+		/*int num_layers = layers;
 
-		FurRenderingEngine::setNumLayers(num_layers);
+		FurRenderingEngine::setNumLayers(num_layers);*/
 
 		//------------------ adding models with initialised shader
 
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
-			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false, "");
+			glm::vec3(0.5f, 0.5f, 0.5f), FUR_OBJ, FUR_SHADER, false, "", 60);
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp");
+			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
 
 		//------------------- adding skybox
 
@@ -305,13 +305,13 @@ void update(SDL_Event sdlEvent)
 		{
 			int num_layers = --layers;
 
-			FurRenderingEngine::setNumLayers(num_layers);
+			FurRenderingEngine::setNumLayers(FUR_OBJ, num_layers);
 		}
 		if (keys[SDL_SCANCODE_6])
 		{
 			int num_layers = ++layers;
 
-			FurRenderingEngine::setNumLayers(num_layers);
+			FurRenderingEngine::setNumLayers(FUR_OBJ, num_layers);
 		}
 	}
 }

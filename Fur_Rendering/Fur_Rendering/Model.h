@@ -16,10 +16,11 @@ private:
 	GLfloat rotZ;
 	GLuint meshIndexCount;
 	GLuint shaderProgram;
+	int numLayers;
 
 public:
 	//rotation is initially set to 0 on all axes
-	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP);
+	Model(GLuint m, GLuint t, glm::vec3 p, glm::vec3 s, GLuint mIC, GLuint sP, int layers);
 
 	GLuint getModel() { return model; }
 
@@ -62,6 +63,9 @@ public:
 
 	GLuint getMeshIndexCount() { return meshIndexCount; }
 	GLuint getShaderProgram() { return shaderProgram; }
+
+	int getNumLayers() { return numLayers; }
+	void setNumLayers(int layers) { numLayers = layers; }
 
 	~Model();
 };
