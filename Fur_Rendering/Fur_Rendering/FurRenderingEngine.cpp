@@ -494,6 +494,7 @@ namespace FurRenderingEngine {
 		m.setPos(newPos);
 
 		bool collision = false;
+		std::string collectableId = "";
 
 		for (auto mod : models)
 		{
@@ -501,7 +502,19 @@ namespace FurRenderingEngine {
 			{
 				m.setPos(oldPos);
 				collision = true;
+
+				if (mod.first.substr(0, 11) == "collectable")
+				{
+					//models.erase(mod.first);
+					std::cout << "deleting collectable " << mod.first.substr(11,12) << "\n";
+					collectableId = mod.first;
+				}
 			}
+		}
+
+		if (collectableId != "")
+		{
+			models.erase(collectableId);
 		}
 
 		//this is to ensure the model with the new position is the only version of the model

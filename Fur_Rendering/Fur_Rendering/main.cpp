@@ -196,6 +196,23 @@ void init()
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
 
+			//adding collectables
+
+		std::string collectableId = "collectable";
+
+		for (int i = 0; i < 5; i++)
+		{
+			collectableId.append(std::to_string(i));
+
+			float randX = rand() % 10;
+			float randZ = rand() % 10;
+
+			FurRenderingEngine::addModel("cube.obj", glm::vec3(randX, 1.0f, randZ),
+				glm::vec3(0.2f, 0.2f, 0.2f), collectableId, PLANE_SHADER, false, "Checkerboard.bmp", 1);
+
+			collectableId = "collectable";
+		}
+
 		//------------------- adding skybox
 
 		const char *cubeTexFiles[6] = {
