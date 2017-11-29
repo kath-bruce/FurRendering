@@ -150,10 +150,10 @@ void init()
 			GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
 
 			int uniformIndex = glGetUniformLocation(shader, "texMap");
-			glUniform1i(uniformIndex, 0);
+			glUniform1i(uniformIndex, 2);
 
 			uniformIndex = glGetUniformLocation(shader, "normalMap");
-			glUniform1i(uniformIndex, 1);
+			glUniform1i(uniformIndex, 3);
 
 			uniformIndex = glGetUniformLocation(shader, "attConst");
 			glUniform1f(uniformIndex, attConstant);
@@ -161,6 +161,11 @@ void init()
 			glUniform1f(uniformIndex, attLinear);
 			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
 			glUniform1f(uniformIndex, attQuadratic);
+
+			glActiveTexture(GL_TEXTURE3); //Normal map
+			glBindTexture(GL_TEXTURE_2D, normal_texture);
+			glActiveTexture(GL_TEXTURE2); //Texture
+
 		}
 		);
 

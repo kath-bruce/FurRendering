@@ -55,6 +55,23 @@ namespace FurRenderingEngine {
 	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
 	glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
 
+	//Temporary normal map light
+	rt3d::lightStruct light0 = {
+		{ 0.4f, 0.4f, 0.4f, 1.0f }, // ambient
+		{ 1.0f, 1.0f, 1.0f, 1.0f }, // diffuse
+		{ 1.0f, 1.0f, 1.0f, 1.0f }, // specular
+		{ -5.0f, 2.0f, 2.0f, 1.0f }  // position
+	};
+	glm::vec4 lightPos(-5.0f, 2.0f, 2.0f, 1.0f); //light position
+
+	//Temporary normal map material
+	rt3d::materialStruct material1 = {
+		{ 0.4f, 0.4f, 1.0f, 1.0f }, // ambient
+		{ 0.8f, 0.8f, 1.0f, 1.0f }, // diffuse
+		{ 0.8f, 0.8f, 0.8f, 1.0f }, // specular
+		1.0f  // shininess
+	};
+
 	GLuint generateTexture()
 	{
 		GLuint texID;
@@ -557,6 +574,11 @@ namespace FurRenderingEngine {
 
 		t += 0.01f;
 
+		glm::vec4 tmp = mvStack.top()*lightPos;
+		light0.position[0] = tmp.x;
+		light0.position[1] = tmp.y;
+		light0.position[2] = tmp.z;
+
 		//skybox
 		{
 			glUseProgram(shaders.at(SKYBOX));
@@ -599,6 +621,9 @@ namespace FurRenderingEngine {
 
 				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "cameraPos");
 				glUniform3fv(uniformIndex, 1, glm::value_ptr(eye));
+				//Testing stuff
+				rt3d::setLight(m.second.getShaderProgram(), light0);
+				rt3d::setMaterial(m.second.getShaderProgram(), material1);
 
 				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
@@ -611,6 +636,8 @@ namespace FurRenderingEngine {
 				mvStack.top() = glm::rotate(mvStack.top(), float(m.second.getRotZ() * DEG_TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
 
 				mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
+
+				rt3d::setLightPos(m.second.getShaderProgram(), glm::value_ptr(tmp));
 
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
 
@@ -631,10 +658,6 @@ namespace FurRenderingEngine {
 			glm::vec4 tmp = mvStack.top()*lightPositions[i];
 			setLightPos(LIGHT_SHADER, glm::value_ptr(tmp), i);
 		}
-
-		//glUseProgram(shaders.at(NORMAL_SHADER));
-		//rt3d::setUniformMatrix4fv(shaders.at(NORMAL_SHADER), "projection", glm::value_ptr(projection));
-
 
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
