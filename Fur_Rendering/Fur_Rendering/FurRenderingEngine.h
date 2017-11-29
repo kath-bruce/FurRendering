@@ -30,7 +30,8 @@ namespace FurRenderingEngine {
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
-		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping, const char * textureFileName, int num_layers);
+		glm::vec3 scale, std::string modelName, std::string shaderName, 
+		bool hasNormalMapping, const char * textureFileName, int num_layers);
 
 	//set light - for later
 	//void setLight(std::string shaderName, rt3d::lightStruct light);
@@ -63,10 +64,7 @@ namespace FurRenderingEngine {
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
 
-	//craigle
-	//void calculateTangents(std::vector<GLfloat> &tangents, std::vector<GLfloat> &verts, std::vector<GLfloat> &normals,
-	//std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices);
-
-	//void createNormalMappingVBO(std::string modelName);
+	//change texture of a model
+	//void setTexture(std::string modelName, const char * textureFileName, bool isFurObj);
 }
 

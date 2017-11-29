@@ -471,12 +471,6 @@ namespace FurRenderingEngine {
 
 		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
-
-		//at = m.getPos(); //at is position of player
-		/*eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-		at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
-		//eye = at;
-		//eye.y += 1.5f;
 	}
 
 	void updateModelPos(std::string modelName, GLfloat diffX, GLfloat diffY, GLfloat diffZ)
@@ -690,8 +684,6 @@ namespace FurRenderingEngine {
 
 	void setNumLayers(std::string modelName, int num_l)
 	{
-		//num_layers = num_l;
-
 		if (models.count(modelName) < 1)
 		{
 			std::cout << "ERROR (setNumLayers): " << modelName << " has not been initialised!\n";
@@ -702,6 +694,7 @@ namespace FurRenderingEngine {
 
 		m.setNumLayers(num_l);
 
+		//this is to ensure the model with the new texture is the only version of the model
 		models.insert_or_assign(modelName, m);
 	}
 
@@ -710,18 +703,20 @@ namespace FurRenderingEngine {
 		fur_chance = fur_c;
 	}
 
-
-
-	/*void createNormalMappingVBO(std::string modelName)
+	/*void setTexture(std::string modelName, const char * textureFileName, bool isFurObj)
 	{
-	std::vector<GLfloat> tangents;
-	std::vector<GLfloat> verts;
-	std::vector<GLfloat> norms;
-	std::vector<GLfloat> tex_coords;
-	std::vector<GLuint> indices;
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (setTexture): " << modelName << " has not been initialised!\n";
+			return;
+		}
 
-	calculateTangents(tangents, verts, norms, tex_coords, indices);
+		Model m = models.at(modelName);
 
+		GLuint text = loadBitmap(textureFileName);
 
+		m.setTexture(text);
+
+		models.insert_or_assign(modelName, m);
 	}*/
 }

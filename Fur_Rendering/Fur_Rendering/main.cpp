@@ -282,6 +282,48 @@ void update(SDL_Event sdlEvent)
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
 		}
 
+		//----------- changing texture
+
+		if (keys[SDL_SCANCODE_P])
+		{
+			//FurRenderingEngine::setTexture(FUR_OBJ, "pink_checkerboard.bmp", true);
+			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+			{
+				GLuint colour_texture = FurRenderingEngine::loadBitmap("pink_checkerboard.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+				glUniform1i(uniformIndex, 0);
+
+				uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+				glUniform1i(uniformIndex, 1);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, colour_texture);
+				glActiveTexture(GL_TEXTURE0);
+			}
+			);
+		}
+
+		if (keys[SDL_SCANCODE_O])
+		{
+			//FurRenderingEngine::setTexture(FUR_OBJ, "rainbow_fur.bmp", true);
+			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+			{
+				GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+				glUniform1i(uniformIndex, 0);
+
+				uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+				glUniform1i(uniformIndex, 1);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, colour_texture);
+				glActiveTexture(GL_TEXTURE0);
+			}
+			);
+		}
+
 		//----------- increasing and decreasing gravity
 		// - modifying the gravity vector does not make much difference
 		if (keys[SDL_SCANCODE_1])
