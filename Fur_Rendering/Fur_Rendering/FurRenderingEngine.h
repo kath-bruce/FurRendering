@@ -8,6 +8,7 @@
 #include <time.h>
 #include "rt3d.h"
 #include "rt3dObjLoader.h"
+#include "CollisionDetector.h"
 #include "Model.h"
 
 namespace FurRenderingEngine {
