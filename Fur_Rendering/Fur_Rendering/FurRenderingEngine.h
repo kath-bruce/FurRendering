@@ -29,7 +29,7 @@ namespace FurRenderingEngine {
 	void regenTexture(std::string modelName);
 
 	void addModel(const char * modelFileName, glm::vec3 pos,
-		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping, const char * textureFileName);
+		glm::vec3 scale, std::string modelName, std::string shaderName, bool hasNormalMapping, const char * textureFileName, int num_layers);
 
 	//set light - for later
 	//void setLight(std::string shaderName, rt3d::lightStruct light);
@@ -57,7 +57,7 @@ namespace FurRenderingEngine {
 	void resetModelRot(std::string modelName);
 
 	//use this to set the number of layers for each model to have rendered
-	void setNumLayers(int num_l);
+	void setNumLayers(std::string modelName, int num_l);
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
