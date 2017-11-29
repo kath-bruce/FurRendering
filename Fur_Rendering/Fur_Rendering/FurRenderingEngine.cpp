@@ -597,6 +597,9 @@ namespace FurRenderingEngine {
 				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
 				glUniform1f(uniformIndex, i);
 
+				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "cameraPos");
+				glUniform3fv(uniformIndex, 1, glm::value_ptr(eye));
+
 				glBindTexture(GL_TEXTURE_2D, m.second.getTexture());
 
 				mvStack.push(mvStack.top());
@@ -611,6 +614,10 @@ namespace FurRenderingEngine {
 
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
 
+				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelMatrix", glm::value_ptr(mvStack.top()));
+
+
+
 				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
 
 				mvStack.pop();
@@ -624,6 +631,10 @@ namespace FurRenderingEngine {
 			glm::vec4 tmp = mvStack.top()*lightPositions[i];
 			setLightPos(LIGHT_SHADER, glm::value_ptr(tmp), i);
 		}
+
+		//glUseProgram(shaders.at(NORMAL_SHADER));
+		//rt3d::setUniformMatrix4fv(shaders.at(NORMAL_SHADER), "projection", glm::value_ptr(projection));
+
 
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
