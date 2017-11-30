@@ -165,6 +165,10 @@
     <None Include="light.vert" />
     <None Include="normalmap.frag" />
     <None Include="normalmap.vert" />
+    <None Include="reflect.frag" />
+    <None Include="reflect.vert" />
+    <None Include="refract.frag" />
+    <None Include="refract.vert" />
     <None Include="textured.frag" />
     <None Include="textured.vert" />
   </ItemGroup>

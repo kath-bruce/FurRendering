@@ -16,7 +16,6 @@ namespace FurRenderingEngine {
 #define SCREENWIDTH 800
 #define SCREENHEIGHT 600
 #define FUR_TEXTURE_DIMENSION 512
-#define LIGHT_SHADER "light_shader"
 #define NORMAL_SHADER "normal_shader"
 #define TEST_SHADER "test_shader"
 
@@ -32,10 +31,6 @@ namespace FurRenderingEngine {
 	void addModel(const char * modelFileName, glm::vec3 pos,
 		glm::vec3 scale, std::string modelName, std::string shaderName, 
 		bool hasNormalMapping, const char * textureFileName, int num_layers);
-
-	//set light - for later
-	//void setLight(std::string shaderName, rt3d::lightStruct light);
-	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber);
 
 	//set material - for later
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat);
@@ -66,5 +61,8 @@ namespace FurRenderingEngine {
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
+
+	//Get Skybox for EnvMap
+	GLuint getSkybox();
 }
 

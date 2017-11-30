@@ -16,6 +16,10 @@
 #define PLANE_OBJ "plane_Obj"
 #define NORMAL_SHADER "normal_Shader"
 #define NORMAL_OBJ "normal_Obj"
+#define REFLECT_SHADER "reflect_shader"
+#define REFLECT_OBJ "reflect_Obj"
+#define REFRACT_SHADER "refract_shader"
+#define REFRACT_OBJ "refract_Obj"
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -25,10 +29,6 @@ int cutoffLayer = 20;
 
 int furAmount = 30;
 
-//light related values
-//const unsigned int NUMBER_OF_LIGHTS = 11;
-//rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-//glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
 //// light attenuation
 float attConstant = 0.6f;
 float attLinear = 0.1f;
@@ -76,9 +76,10 @@ void init()
 	{
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
-		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
 		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
+		FurRenderingEngine::addShader(REFLECT_SHADER, "reflect.vert", "reflect.frag");
+		FurRenderingEngine::addShader(REFRACT_SHADER, "refract.vert", "refract.frag");
 
 		//---------------- setting uniforms
 
@@ -146,6 +147,7 @@ void init()
 		//---------------- setting normal mapping uniforms
 		FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader) 
 		{
+			//Loading normal map texture
 			GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
 
 			int uniformIndex = glGetUniformLocation(shader, "texMap");
@@ -161,12 +163,62 @@ void init()
 			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
 			glUniform1f(uniformIndex, attQuadratic);
 
-			glActiveTexture(GL_TEXTURE3); //Normal map
+			glActiveTexture(GL_TEXTURE3); //Normal map binding
 			glBindTexture(GL_TEXTURE_2D, normal_texture);
-			glActiveTexture(GL_TEXTURE2); //Texture
+			glActiveTexture(GL_TEXTURE2); //Texture binding
 
 		}
 		);
+
+		//------------------ setting environment mapped reflection uniforms
+		FurRenderingEngine::setUniform(REFLECT_SHADER, [](GLuint shader) 
+		{
+			GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+
+			int uniformIndex = glGetUniformLocation(shader, "cubeMap");
+			glUniform1i(uniformIndex, 4);
+
+			uniformIndex = glGetUniformLocation(shader, "texMap");
+			glUniform1i(uniformIndex, 5);
+
+			uniformIndex = glGetUniformLocation(shader, "attConst");
+			glUniform1f(uniformIndex, attConstant);
+			uniformIndex = glGetUniformLocation(shader, "attLinear");
+			glUniform1f(uniformIndex, attLinear);
+			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+			glUniform1f(uniformIndex, attQuadratic);
+
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_2D, metal_texture);
+		}
+		);
+
+		////------------------ setting environment mapped refraction uniforms
+		//FurRenderingEngine::setUniform(REFRACT_SHADER, [](GLuint shader) 
+		//{
+		//	GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+
+		//	int uniformIndex = glGetUniformLocation(shader, "cubeMap");
+		//	glUniform1i(uniformIndex, 6);
+
+		//	uniformIndex = glGetUniformLocation(shader, "texMap");
+		//	glUniform1i(uniformIndex, 7);
+
+		//	uniformIndex = glGetUniformLocation(shader, "attConst");
+		//	glUniform1f(uniformIndex, attConstant);
+		//	uniformIndex = glGetUniformLocation(shader, "attLinear");
+		//	glUniform1f(uniformIndex, attLinear);
+		//	uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+		//	glUniform1f(uniformIndex, attQuadratic);
+
+		//	glActiveTexture(GL_TEXTURE7);
+		//	glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
+		//	glActiveTexture(GL_TEXTURE6);
+		//	glBindTexture(GL_TEXTURE_2D, metal_texture);
+		//}
+		//);
 
 		//------------------ adding models with initialised shader
 
@@ -175,6 +227,12 @@ void init()
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(2.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), REFLECT_OBJ, REFLECT_SHADER, false, "metal-texturemap.bmp", 1);
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(-2.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), REFRACT_OBJ, REFRACT_SHADER, false, "metal-texturemap.bmp", 1);
 
 			//adding collectables
 
@@ -194,6 +252,8 @@ void init()
 		}
 
 			//
+
+		//------------------- adding normal mapped cube
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
@@ -281,11 +341,10 @@ void update(SDL_Event sdlEvent)
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
 		}
 
-		//----------- changing texture
+		//----------- changing texture of fox
 
 		if (keys[SDL_SCANCODE_P])
 		{
-			//FurRenderingEngine::setTexture(FUR_OBJ, "pink_checkerboard.bmp", true);
 			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 			{
 				GLuint colour_texture = FurRenderingEngine::loadBitmap("pink_checkerboard.bmp");
@@ -305,7 +364,6 @@ void update(SDL_Event sdlEvent)
 
 		if (keys[SDL_SCANCODE_O])
 		{
-			//FurRenderingEngine::setTexture(FUR_OBJ, "rainbow_fur.bmp", true);
 			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 			{
 				GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
@@ -323,6 +381,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
+		//----------- activating and deactivating normal mapping
 		if (keys[SDL_SCANCODE_8])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
@@ -333,6 +392,26 @@ void update(SDL_Event sdlEvent)
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
 		}
+
+		if (keys[SDL_SCANCODE_K])
+		{
+			FurRenderingEngine::setShader(REFLECT_OBJ, PLANE_SHADER);
+		}
+		if (keys[SDL_SCANCODE_L])
+		{
+			FurRenderingEngine::setShader(REFLECT_OBJ, REFLECT_SHADER);
+
+		}
+		if (keys[SDL_SCANCODE_N])
+		{
+			FurRenderingEngine::setShader(REFRACT_OBJ, PLANE_SHADER);
+		}
+		if (keys[SDL_SCANCODE_M])
+		{
+			FurRenderingEngine::setShader(REFRACT_OBJ, REFRACT_SHADER);
+
+		}
+
 
 		//----------- increasing and decreasing gravity
 		// - modifying the gravity vector does not make much difference
@@ -384,7 +463,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
-		// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
+		//----------- layers is how many times the model will be rendered, regardless of what the cutoff layer is
 		if (keys[SDL_SCANCODE_5])
 		{
 			int num_layers = --layers;
