@@ -23,11 +23,13 @@ int grav_effect = 60;
 int layers = 60;
 int cutoffLayer = 20;
 
+int furAmount = 30;
+
 //light related values
-const unsigned int NUMBER_OF_LIGHTS = 11;
-rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
-// light attenuation
+//const unsigned int NUMBER_OF_LIGHTS = 11;
+//rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
+//glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+//// light attenuation
 float attConstant = 0.6f;
 float attLinear = 0.1f;
 float attQuadratic = 0.1f;
@@ -182,8 +184,8 @@ void init()
 		{
 			collectableId.append(std::to_string(i));
 
-			float randX = rand() % 10;
-			float randZ = rand() % 10;
+			float randX = rand() % 10 + 1;
+			float randZ = rand() % 10 + 1;
 
 			FurRenderingEngine::addModel("cube.obj", glm::vec3(randX, 1.0f, randZ),
 				glm::vec3(0.2f, 0.2f, 0.2f), collectableId, PLANE_SHADER, false, "Checkerboard.bmp", 1);
@@ -256,6 +258,20 @@ void update(SDL_Event sdlEvent)
 		//	- could be used in conjunction with setFurChance to adjust how much fur an object has
 		if (keys[SDL_SCANCODE_R])
 		{
+			FurRenderingEngine::regenTexture(FUR_OBJ);
+		}
+
+		if (keys[SDL_SCANCODE_F])
+		{
+			furAmount++;
+			FurRenderingEngine::setFurChance(furAmount);
+			FurRenderingEngine::regenTexture(FUR_OBJ);
+		}
+
+		if (keys[SDL_SCANCODE_G])
+		{
+			furAmount--;
+			FurRenderingEngine::setFurChance(furAmount);
 			FurRenderingEngine::regenTexture(FUR_OBJ);
 		}
 

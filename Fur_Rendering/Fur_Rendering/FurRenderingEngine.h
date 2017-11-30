@@ -66,10 +66,5 @@ namespace FurRenderingEngine {
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
-
-	void setShader(std::string modelName, std::string shaderName);
-
-	//change texture of a model
-	//void setTexture(std::string modelName, const char * textureFileName, bool isFurObj);
 }
 

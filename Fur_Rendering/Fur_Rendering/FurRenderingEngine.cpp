@@ -197,7 +197,6 @@ namespace FurRenderingEngine {
 
 	void addSkybox(const char *fname[6], const char * skyboxVert, const char * skyboxFrag)
 	{
-		//add skybox rendering code!!!
 
 		GLuint skyboxProg = rt3d::initShaders(skyboxVert, skyboxFrag);
 		shaders.insert({ SKYBOX, skyboxProg });
@@ -346,10 +345,6 @@ namespace FurRenderingEngine {
 			texture = loadBitmap(textureFileName);
 		}
 
-		//auto modelLayerPair = std::make_pair(Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram), num_layers);
-
-		//models.emplace(std::make_pair(modelName, modelLayerPair));
-		//models[modelName] = modelLayerPair;
 		models.emplace(std::make_pair(modelName, Model(modelObj, texture, pos, scale, meshIndexCount, shaderProgram, num_layers)));
 
 	}
@@ -445,14 +440,14 @@ namespace FurRenderingEngine {
 	}
 
 	//for later
-	glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
+	/*glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
 		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
-	}
+	}*/
 
 	//for later
-	glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
+	/*glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
 		return glm::vec3(pos.x + d*std::cos(angle*DEG_TO_RADIAN), pos.y, pos.z + d*std::sin(angle*DEG_TO_RADIAN));
-	}
+	}*/
 
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
@@ -651,14 +646,6 @@ namespace FurRenderingEngine {
 			}
 		}
 
-		const unsigned int NUMBER_OF_LIGHTS = 11;
-		glUseProgram(shaders.at(LIGHT_SHADER));
-		rt3d::setUniformMatrix4fv(shaders.at(LIGHT_SHADER), "projection", glm::value_ptr(projection));
-		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
-			glm::vec4 tmp = mvStack.top()*lightPositions[i];
-			setLightPos(LIGHT_SHADER, glm::value_ptr(tmp), i);
-		}
-
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
 
@@ -725,21 +712,4 @@ namespace FurRenderingEngine {
 		models.insert_or_assign(modelName, m);
 
 	}
-
-	/*void setTexture(std::string modelName, const char * textureFileName, bool isFurObj)
-	{
-		if (models.count(modelName) < 1)
-		{
-			std::cout << "ERROR (setTexture): " << modelName << " has not been initialised!\n";
-			return;
-		}
-
-		Model m = models.at(modelName);
-
-		GLuint text = loadBitmap(textureFileName);
-
-		m.setTexture(text);
-
-		models.insert_or_assign(modelName, m);
-	}*/
 }
