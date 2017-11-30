@@ -42,12 +42,8 @@ namespace FurRenderingEngine {
 	GLuint skybox[5];
 	GLuint cube;
 	GLuint meshIndexCount;
-
-	//Light test for Normal Map
-	// light attenuation
-	float attConstant = 1.0f;
-	float attLinear = 0.0f;
-	float attQuadratic = 0.0f;
+	
+	//Theta for 
 	float theta = 0.0f;
 
 	//Lights
@@ -562,7 +558,7 @@ namespace FurRenderingEngine {
 		glm::mat4 modelview(1.0); // set base position for scene
 		mvStack.push(modelview);
 
-		//Independently calculate the model matrix from the view for normal mapping
+		//Independently calculate the model matrix from the view for normal mapping uniform.
 		glm::mat4 modelMatrix(1.0);
 		mvStack.push(mvStack.top());
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2.0f, 1.0f, -3.0f));
@@ -576,6 +572,7 @@ namespace FurRenderingEngine {
 
 		t += 0.01f;
 
+		//Light position for normal mapping
 		glm::vec4 tmp = mvStack.top()*lightPos;
 		light0.position[0] = tmp.x;
 		light0.position[1] = tmp.y;
@@ -615,15 +612,19 @@ namespace FurRenderingEngine {
 
 			for (int i = 0; i < m.second.getNumLayers(); i++)
 			{
+
+				//Projection uniform
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "projection", glm::value_ptr(projection));
 
 				//this needs to be set for every layer
 				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "layer");
 				glUniform1f(uniformIndex, i);
 
+				//Camera pos uniform
 				uniformIndex = glGetUniformLocation(m.second.getShaderProgram(), "cameraPos");
 				glUniform3fv(uniformIndex, 1, glm::value_ptr(eye));
-				//Testing stuff
+
+				//Light and Material uniforms
 				rt3d::setLight(m.second.getShaderProgram(), light0);
 				rt3d::setMaterial(m.second.getShaderProgram(), material1);
 
@@ -639,10 +640,13 @@ namespace FurRenderingEngine {
 
 				mvStack.top() = glm::scale(mvStack.top(), m.second.getScale());
 
+				//Light position uniform
 				rt3d::setLightPos(m.second.getShaderProgram(), glm::value_ptr(tmp));
 
+				//Modelview uniform
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelview", glm::value_ptr(mvStack.top()));
 
+				//Modelmatrix uniform
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelMatrix", glm::value_ptr(mvStack.top()));
 
 				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
@@ -661,10 +665,6 @@ namespace FurRenderingEngine {
 
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
-
-	}
-
-	void drawNormalCube(bool normalMap) {
 
 	}
 
