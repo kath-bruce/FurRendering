@@ -63,6 +63,7 @@ public:
 
 	GLuint getMeshIndexCount() { return meshIndexCount; }
 	GLuint getShaderProgram() { return shaderProgram; }
+	void setShaderProgam(GLuint newShader) { shaderProgram = newShader; }
 
 	int getNumLayers() { return numLayers; }
 	void setNumLayers(int layers) { numLayers = layers; }
