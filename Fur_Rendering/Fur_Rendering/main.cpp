@@ -193,9 +193,6 @@ void init()
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
 
-		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
-
 			//adding collectables
 
 		std::string collectableId = "collectable";
@@ -212,6 +209,11 @@ void init()
 
 			collectableId = "collectable";
 		}
+
+			//
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
 
 		//------------------- adding skybox
 
