@@ -23,11 +23,13 @@ int grav_effect = 60;
 int layers = 60;
 int cutoffLayer = 20;
 
+int furAmount = 30;
+
 //light related values
-const unsigned int NUMBER_OF_LIGHTS = 11;
-rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
-// light attenuation
+//const unsigned int NUMBER_OF_LIGHTS = 11;
+//rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
+//glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
+//// light attenuation
 float attConstant = 0.6f;
 float attLinear = 0.1f;
 float attQuadratic = 0.1f;
@@ -98,7 +100,6 @@ void init()
 		}
 		);
 
-		//to be deprecated????
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
 			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
@@ -125,8 +126,6 @@ void init()
 			glUniform1i(uniformIndex, cutoff_Layer);
 		}
 		);
-
-		//colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
 
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
@@ -170,22 +169,6 @@ void init()
 		}
 		);
 
-		glm::vec4 colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);   //sets the starting light colour
-		glm::vec4 pos = glm::vec4(0.0f, 2.0f, 0.0f, 1.0f);		// sets the starting light position
-		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
-			lights[i].ambient[0] = 0.1f; lights[i].ambient[1] = 0.0f; lights[i].ambient[2] = 0.0f; lights[i].ambient[3] = 1.0f;
-			lights[i].diffuse[0] = 1.0f; lights[i].diffuse[1] = 0.0f; lights[i].diffuse[2] = 0.0f; lights[i].diffuse[3] = 1.0f;
-			lights[i].specular[0] = 1.0f; lights[i].specular[1] = 0.0f; lights[i].specular[2] = 0.0f; lights[i].specular[3] = 1.0f;
-			lightPositions[i] = glm::vec4(10.0f, -10.0f, 10.0f, 0.0f);
-			FurRenderingEngine::setLight(LIGHT_SHADER, lights[i], i);
-		}
-
-		//---------------- setting fur rendering engine values
-
-		/*int num_layers = layers;
-
-		FurRenderingEngine::setNumLayers(num_layers);*/
-
 		//------------------ adding models with initialised shader
 
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
@@ -202,8 +185,8 @@ void init()
 		{
 			collectableId.append(std::to_string(i));
 
-			float randX = rand() % 10;
-			float randZ = rand() % 10;
+			float randX = rand() % 10 + 1;
+			float randZ = rand() % 10 + 1;
 
 			FurRenderingEngine::addModel("cube.obj", glm::vec3(randX, 1.0f, randZ),
 				glm::vec3(0.2f, 0.2f, 0.2f), collectableId, PLANE_SHADER, false, "Checkerboard.bmp", 1);
@@ -278,6 +261,20 @@ void update(SDL_Event sdlEvent)
 		//	- could be used in conjunction with setFurChance to adjust how much fur an object has
 		if (keys[SDL_SCANCODE_R])
 		{
+			FurRenderingEngine::regenTexture(FUR_OBJ);
+		}
+
+		if (keys[SDL_SCANCODE_F])
+		{
+			furAmount++;
+			FurRenderingEngine::setFurChance(furAmount);
+			FurRenderingEngine::regenTexture(FUR_OBJ);
+		}
+
+		if (keys[SDL_SCANCODE_G])
+		{
+			furAmount--;
+			FurRenderingEngine::setFurChance(furAmount);
 			FurRenderingEngine::regenTexture(FUR_OBJ);
 		}
 

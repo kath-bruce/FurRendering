@@ -43,6 +43,9 @@ namespace FurRenderingEngine {
 	//set uniform for a shader - specific type of uniform is set in the lambda
 	void setUniform(std::string shaderName, std::function<void(GLuint)> lambda);
 
+	//set shader for a model
+	void setShader(std::string modelName, std::string shaderName);
+
 	//increases model rotation by rotX, rotY and rotZ
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ);
 
@@ -63,10 +66,5 @@ namespace FurRenderingEngine {
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
-
-	void setShader(std::string modelName, std::string shaderName);
-
-	//change texture of a model
-	//void setTexture(std::string modelName, const char * textureFileName, bool isFurObj);
 }
 
