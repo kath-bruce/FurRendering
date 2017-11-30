@@ -647,8 +647,6 @@ namespace FurRenderingEngine {
 
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelMatrix", glm::value_ptr(mvStack.top()));
 
-
-
 				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
 
 				mvStack.pop();
@@ -665,6 +663,10 @@ namespace FurRenderingEngine {
 
 		// remember to use at least one pop operation per push...
 		mvStack.pop(); // initial matrix
+
+	}
+
+	void drawNormalCube(bool normalMap) {
 
 	}
 
