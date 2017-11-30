@@ -707,6 +707,29 @@ namespace FurRenderingEngine {
 		fur_chance = fur_c;
 	}
 
+	void setShader(std::string modelName, std::string shaderName)
+	{
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (setShader): " << modelName << " has not been initialised!\n";
+			return;
+		}
+
+		if (shaders.count(shaderName) < 1)
+		{
+			std::cout << "ERROR (setShader): " << shaderName << " has not been initialised!\n";
+			return;
+		}
+
+		Model m = models.at(modelName);
+
+		m.setShaderProgam(shaders.at(shaderName));
+
+		//this is to ensure the model with the new shader is the only version of the model
+		models.insert_or_assign(modelName, m);
+
+	}
+
 	/*void setTexture(std::string modelName, const char * textureFileName, bool isFurObj)
 	{
 		if (models.count(modelName) < 1)

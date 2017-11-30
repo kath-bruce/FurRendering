@@ -326,6 +326,49 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
+		if (keys[SDL_SCANCODE_8])
+		{
+			/*FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader)
+			{
+
+				GLuint texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "normalMap");
+				glUniform1i(uniformIndex, 3);
+
+				uniformIndex = glGetUniformLocation(shader, "texMap");
+				glUniform1i(uniformIndex, 2);
+
+				glActiveTexture(GL_TEXTURE3);
+				glBindTexture(GL_TEXTURE_2D, texture);
+				glActiveTexture(GL_TEXTURE2);
+			}
+			);*/
+			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
+
+		}
+
+		if (keys[SDL_SCANCODE_9])
+		{
+			/*FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader)
+			{
+
+				GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "normalMap");
+				glUniform1i(uniformIndex, 3);
+
+				uniformIndex = glGetUniformLocation(shader, "texMap");
+				glUniform1i(uniformIndex, 2);
+
+				glActiveTexture(GL_TEXTURE3);
+				glBindTexture(GL_TEXTURE_2D, normal_texture);
+				glActiveTexture(GL_TEXTURE2);
+			}
+			);*/
+			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
+		}
+
 		//----------- increasing and decreasing gravity
 		// - modifying the gravity vector does not make much difference
 		if (keys[SDL_SCANCODE_1])
