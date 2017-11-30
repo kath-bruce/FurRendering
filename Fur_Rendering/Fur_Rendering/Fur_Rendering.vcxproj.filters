@@ -82,5 +82,17 @@
     <None Include="normalmap.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="reflect.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="reflect.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="refract.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="refract.frag">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

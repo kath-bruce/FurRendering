@@ -66,5 +66,8 @@ namespace FurRenderingEngine {
 
 	//use this to set how much fur is generated
 	void setFurChance(int fur_c);
+
+	//Get Skybox for EnvMap
+	GLuint getSkybox();
 }
 

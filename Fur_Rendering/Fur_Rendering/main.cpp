@@ -16,6 +16,10 @@
 #define PLANE_OBJ "plane_Obj"
 #define NORMAL_SHADER "normal_Shader"
 #define NORMAL_OBJ "normal_Obj"
+#define REFLECT_SHADER "reflect_shader"
+#define REFLECT_OBJ "reflect_Obj"
+#define REFRACT_SHADER "refract_shader"
+#define REFRACT_OBJ "refract_Obj"
 
 //the magnitude of the y value describes how intense the gravity is
 int grav_effect = 60;
@@ -79,6 +83,8 @@ void init()
 		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
 		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
+		FurRenderingEngine::addShader(REFLECT_SHADER, "reflect.vert", "reflect.frag");
+		FurRenderingEngine::addShader(REFRACT_SHADER, "refract.vert", "refract.frag");
 
 		//---------------- setting uniforms
 
@@ -168,6 +174,56 @@ void init()
 		}
 		);
 
+		//------------------ setting environment mapped reflection uniforms
+		FurRenderingEngine::setUniform(REFLECT_SHADER, [](GLuint shader) 
+		{
+			GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+
+			int uniformIndex = glGetUniformLocation(shader, "cubeMap");
+			glUniform1i(uniformIndex, 4);
+
+			uniformIndex = glGetUniformLocation(shader, "texMap");
+			glUniform1i(uniformIndex, 5);
+
+			uniformIndex = glGetUniformLocation(shader, "attConst");
+			glUniform1f(uniformIndex, attConstant);
+			uniformIndex = glGetUniformLocation(shader, "attLinear");
+			glUniform1f(uniformIndex, attLinear);
+			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+			glUniform1f(uniformIndex, attQuadratic);
+
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_2D, metal_texture);
+		}
+		);
+
+		////------------------ setting environment mapped refraction uniforms
+		//FurRenderingEngine::setUniform(REFRACT_SHADER, [](GLuint shader) 
+		//{
+		//	GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+
+		//	int uniformIndex = glGetUniformLocation(shader, "cubeMap");
+		//	glUniform1i(uniformIndex, 6);
+
+		//	uniformIndex = glGetUniformLocation(shader, "texMap");
+		//	glUniform1i(uniformIndex, 7);
+
+		//	uniformIndex = glGetUniformLocation(shader, "attConst");
+		//	glUniform1f(uniformIndex, attConstant);
+		//	uniformIndex = glGetUniformLocation(shader, "attLinear");
+		//	glUniform1f(uniformIndex, attLinear);
+		//	uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+		//	glUniform1f(uniformIndex, attQuadratic);
+
+		//	glActiveTexture(GL_TEXTURE7);
+		//	glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
+		//	glActiveTexture(GL_TEXTURE6);
+		//	glBindTexture(GL_TEXTURE_2D, metal_texture);
+		//}
+		//);
+
 		//------------------ adding models with initialised shader
 
 		FurRenderingEngine::addModel("fox.obj", glm::vec3(0.0f, 1.0f, -3.0f),
@@ -175,6 +231,12 @@ void init()
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(2.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), REFLECT_OBJ, REFLECT_SHADER, false, "metal-texturemap.bmp", 1);
+
+		FurRenderingEngine::addModel("cube.obj", glm::vec3(-2.0f, 1.0f, 0.0f),
+			glm::vec3(0.5f, 0.5f, 0.5f), REFRACT_OBJ, REFRACT_SHADER, false, "metal-texturemap.bmp", 1);
 
 			//adding collectables
 
@@ -333,6 +395,26 @@ void update(SDL_Event sdlEvent)
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
 		}
+
+		if (keys[SDL_SCANCODE_K])
+		{
+			FurRenderingEngine::setShader(REFLECT_OBJ, PLANE_SHADER);
+		}
+		if (keys[SDL_SCANCODE_L])
+		{
+			FurRenderingEngine::setShader(REFLECT_OBJ, REFLECT_SHADER);
+
+		}
+		if (keys[SDL_SCANCODE_N])
+		{
+			FurRenderingEngine::setShader(REFRACT_OBJ, PLANE_SHADER);
+		}
+		if (keys[SDL_SCANCODE_M])
+		{
+			FurRenderingEngine::setShader(REFRACT_OBJ, REFRACT_SHADER);
+
+		}
+
 
 		//----------- increasing and decreasing gravity
 		// - modifying the gravity vector does not make much difference

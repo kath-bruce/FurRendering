@@ -690,6 +690,11 @@ namespace FurRenderingEngine {
 		fur_chance = fur_c;
 	}
 
+	GLuint getSkybox()
+	{
+		return skybox[0];
+	}
+
 	void setShader(std::string modelName, std::string shaderName)
 	{
 		if (models.count(modelName) < 1)
