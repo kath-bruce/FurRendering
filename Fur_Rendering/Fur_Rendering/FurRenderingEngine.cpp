@@ -664,10 +664,6 @@ namespace FurRenderingEngine {
 
 	}
 
-	void drawNormalCube(bool normalMap) {
-
-	}
-
 	void resetModelRot(std::string modelName)
 	{
 		if (models.count(modelName) < 1)

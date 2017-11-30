@@ -98,7 +98,6 @@ void init()
 		}
 		);
 
-		//to be deprecated????
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
 			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
@@ -125,8 +124,6 @@ void init()
 			glUniform1i(uniformIndex, cutoff_Layer);
 		}
 		);
-
-		//colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
 
 		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 		{
@@ -168,22 +165,6 @@ void init()
 
 		}
 		);
-
-		glm::vec4 colour = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);   //sets the starting light colour
-		glm::vec4 pos = glm::vec4(0.0f, 2.0f, 0.0f, 1.0f);		// sets the starting light position
-		for (size_t i = 0; i < NUMBER_OF_LIGHTS; i++) {
-			lights[i].ambient[0] = 0.1f; lights[i].ambient[1] = 0.0f; lights[i].ambient[2] = 0.0f; lights[i].ambient[3] = 1.0f;
-			lights[i].diffuse[0] = 1.0f; lights[i].diffuse[1] = 0.0f; lights[i].diffuse[2] = 0.0f; lights[i].diffuse[3] = 1.0f;
-			lights[i].specular[0] = 1.0f; lights[i].specular[1] = 0.0f; lights[i].specular[2] = 0.0f; lights[i].specular[3] = 1.0f;
-			lightPositions[i] = glm::vec4(10.0f, -10.0f, 10.0f, 0.0f);
-			FurRenderingEngine::setLight(LIGHT_SHADER, lights[i], i);
-		}
-
-		//---------------- setting fur rendering engine values
-
-		/*int num_layers = layers;
-
-		FurRenderingEngine::setNumLayers(num_layers);*/
 
 		//------------------ adding models with initialised shader
 
@@ -328,44 +309,12 @@ void update(SDL_Event sdlEvent)
 
 		if (keys[SDL_SCANCODE_8])
 		{
-			/*FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader)
-			{
-
-				GLuint texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
-
-				int uniformIndex = glGetUniformLocation(shader, "normalMap");
-				glUniform1i(uniformIndex, 3);
-
-				uniformIndex = glGetUniformLocation(shader, "texMap");
-				glUniform1i(uniformIndex, 2);
-
-				glActiveTexture(GL_TEXTURE3);
-				glBindTexture(GL_TEXTURE_2D, texture);
-				glActiveTexture(GL_TEXTURE2);
-			}
-			);*/
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
 
 		}
 
 		if (keys[SDL_SCANCODE_9])
 		{
-			/*FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader)
-			{
-
-				GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
-
-				int uniformIndex = glGetUniformLocation(shader, "normalMap");
-				glUniform1i(uniformIndex, 3);
-
-				uniformIndex = glGetUniformLocation(shader, "texMap");
-				glUniform1i(uniformIndex, 2);
-
-				glActiveTexture(GL_TEXTURE3);
-				glBindTexture(GL_TEXTURE_2D, normal_texture);
-				glActiveTexture(GL_TEXTURE2);
-			}
-			);*/
 			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
 		}
 
