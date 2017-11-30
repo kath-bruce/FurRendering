@@ -298,7 +298,7 @@ namespace FurRenderingEngine {
 			return;
 		}
 
-		//this is a small check to ensure that the same model is not repeastedly loaded from file
+		//this is a small check to ensure that the same model is not repeatedly loaded from file
 		//passing a different model name will allow another copy to be loaded if needed
 		if (models.count(modelName) > 1)
 		{
@@ -471,12 +471,6 @@ namespace FurRenderingEngine {
 
 		//this is to ensure the model with the new rotation is the only version of the model
 		models.insert_or_assign(modelName, m);
-
-		//at = m.getPos(); //at is position of player
-		/*eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-		at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));*/
-		//eye = at;
-		//eye.y += 1.5f;
 	}
 
 	void updateModelPos(std::string modelName, GLfloat diffX, GLfloat diffY, GLfloat diffZ)
@@ -489,35 +483,39 @@ namespace FurRenderingEngine {
 
 		Model m = models.at(modelName);
 
+		glm::vec3 oldPos = m.getPos();
 		glm::vec3 newPos(m.getPos().x + diffX, m.getPos().y + diffY, m.getPos().z + diffZ);
 		m.setPos(newPos);
 
-		//use move forward and move right?????
+		bool collision = false;
+		std::string collectableId = "";
 
-		/*if (diffZ != 0)
+		for (auto mod : models)
 		{
-		m.setPos(moveForward(m.getPos(), m.getRotY(), diffZ));
+			if (mod.first != modelName && CollisionDetector::detectCollision(mod.second, m))
+			{
+				m.setPos(oldPos);
+				collision = true;
+
+				if (mod.first.substr(0, 11) == "collectable")
+				{
+					//models.erase(mod.first);
+					std::cout << "deleting collectable " << mod.first.substr(11,12) << "\n";
+					collectableId = mod.first;
+				}
+			}
 		}
-		if (diffX != 0)
+
+		if (collectableId != "")
 		{
-		m.setPos(moveRight(m.getPos(), m.getRotY(), diffX));
-		}*/
+			models.erase(collectableId);
+		}
 
-		//this is to ensure the model with the new rotation is the only version of the model
-		models.insert_or_assign(modelName, m);
+		//this is to ensure the model with the new position is the only version of the model
+		if (!collision)
+			models.insert_or_assign(modelName, m);
 
-		//eye = glm::vec3(at.x + (-8.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-		//at.y, at.z - (-8.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
-		//eye.y += 3.0;
-
-
-		at = m.getPos(); //at is position of player
-
-						 //eye = glm::vec3(at.x + (-3.0f)*std::sin(m.getRotY()*DEG_TO_RADIAN),
-						 //at.y, at.z - (-3.0f)*std::cos(m.getRotY()*DEG_TO_RADIAN));
-						 //eye = at;
-						 //eye.y += 1.5f;
-						 //mvStack.top() = glm::lookAt(eye, at, up);
+		at = m.getPos();
 	}
 
 	void zoomToModel(std::string modelName, GLfloat zoomFactor)
@@ -647,8 +645,6 @@ namespace FurRenderingEngine {
 
 				rt3d::setUniformMatrix4fv(m.second.getShaderProgram(), "modelMatrix", glm::value_ptr(mvStack.top()));
 
-
-
 				rt3d::drawIndexedMesh(m.second.getModel(), m.second.getMeshIndexCount(), GL_TRIANGLES);
 
 				mvStack.pop();
@@ -688,8 +684,6 @@ namespace FurRenderingEngine {
 
 	void setNumLayers(std::string modelName, int num_l)
 	{
-		//num_layers = num_l;
-
 		if (models.count(modelName) < 1)
 		{
 			std::cout << "ERROR (setNumLayers): " << modelName << " has not been initialised!\n";
@@ -700,6 +694,7 @@ namespace FurRenderingEngine {
 
 		m.setNumLayers(num_l);
 
+		//this is to ensure the model with the new texture is the only version of the model
 		models.insert_or_assign(modelName, m);
 	}
 
@@ -708,18 +703,20 @@ namespace FurRenderingEngine {
 		fur_chance = fur_c;
 	}
 
-
-
-	/*void createNormalMappingVBO(std::string modelName)
+	/*void setTexture(std::string modelName, const char * textureFileName, bool isFurObj)
 	{
-	std::vector<GLfloat> tangents;
-	std::vector<GLfloat> verts;
-	std::vector<GLfloat> norms;
-	std::vector<GLfloat> tex_coords;
-	std::vector<GLuint> indices;
+		if (models.count(modelName) < 1)
+		{
+			std::cout << "ERROR (setTexture): " << modelName << " has not been initialised!\n";
+			return;
+		}
 
-	calculateTangents(tangents, verts, norms, tex_coords, indices);
+		Model m = models.at(modelName);
 
+		GLuint text = loadBitmap(textureFileName);
 
+		m.setTexture(text);
+
+		models.insert_or_assign(modelName, m);
 	}*/
 }

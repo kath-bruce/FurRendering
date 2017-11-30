@@ -194,7 +194,24 @@ void init()
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
 
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp");
+			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
+
+			//adding collectables
+
+		std::string collectableId = "collectable";
+
+		for (int i = 0; i < 5; i++)
+		{
+			collectableId.append(std::to_string(i));
+
+			float randX = rand() % 10;
+			float randZ = rand() % 10;
+
+			FurRenderingEngine::addModel("cube.obj", glm::vec3(randX, 1.0f, randZ),
+				glm::vec3(0.2f, 0.2f, 0.2f), collectableId, PLANE_SHADER, false, "Checkerboard.bmp", 1);
+
+			collectableId = "collectable";
+		}
 
 		//------------------- adding skybox
 
@@ -263,6 +280,48 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_Q])
 		{
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
+		}
+
+		//----------- changing texture
+
+		if (keys[SDL_SCANCODE_P])
+		{
+			//FurRenderingEngine::setTexture(FUR_OBJ, "pink_checkerboard.bmp", true);
+			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+			{
+				GLuint colour_texture = FurRenderingEngine::loadBitmap("pink_checkerboard.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+				glUniform1i(uniformIndex, 0);
+
+				uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+				glUniform1i(uniformIndex, 1);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, colour_texture);
+				glActiveTexture(GL_TEXTURE0);
+			}
+			);
+		}
+
+		if (keys[SDL_SCANCODE_O])
+		{
+			//FurRenderingEngine::setTexture(FUR_OBJ, "rainbow_fur.bmp", true);
+			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
+			{
+				GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
+
+				int uniformIndex = glGetUniformLocation(shader, "textureUnit0");
+				glUniform1i(uniformIndex, 0);
+
+				uniformIndex = glGetUniformLocation(shader, "textureUnit1");
+				glUniform1i(uniformIndex, 1);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, colour_texture);
+				glActiveTexture(GL_TEXTURE0);
+			}
+			);
 		}
 
 		//----------- increasing and decreasing gravity
