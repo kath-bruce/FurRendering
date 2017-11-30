@@ -29,10 +29,6 @@ int cutoffLayer = 20;
 
 int furAmount = 30;
 
-//light related values
-//const unsigned int NUMBER_OF_LIGHTS = 11;
-//rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-//glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
 //// light attenuation
 float attConstant = 0.6f;
 float attLinear = 0.1f;
@@ -80,7 +76,6 @@ void init()
 	{
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
-		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
 		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
 		FurRenderingEngine::addShader(REFLECT_SHADER, "reflect.vert", "reflect.frag");
@@ -152,6 +147,7 @@ void init()
 		//---------------- setting normal mapping uniforms
 		FurRenderingEngine::setUniform(NORMAL_SHADER, [](GLuint shader) 
 		{
+			//Loading normal map texture
 			GLuint normal_texture = FurRenderingEngine::loadBitmap("metal-normalmap.bmp");
 
 			int uniformIndex = glGetUniformLocation(shader, "texMap");
@@ -167,9 +163,9 @@ void init()
 			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
 			glUniform1f(uniformIndex, attQuadratic);
 
-			glActiveTexture(GL_TEXTURE3); //Normal map
+			glActiveTexture(GL_TEXTURE3); //Normal map binding
 			glBindTexture(GL_TEXTURE_2D, normal_texture);
-			glActiveTexture(GL_TEXTURE2); //Texture
+			glActiveTexture(GL_TEXTURE2); //Texture binding
 
 		}
 		);
@@ -257,6 +253,8 @@ void init()
 
 			//
 
+		//------------------- adding normal mapped cube
+
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.5f, 0.5f, 0.5f), NORMAL_OBJ, NORMAL_SHADER, true, "metal-texturemap.bmp", 1);
 
@@ -343,11 +341,10 @@ void update(SDL_Event sdlEvent)
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
 		}
 
-		//----------- changing texture
+		//----------- changing texture of fox
 
 		if (keys[SDL_SCANCODE_P])
 		{
-			//FurRenderingEngine::setTexture(FUR_OBJ, "pink_checkerboard.bmp", true);
 			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 			{
 				GLuint colour_texture = FurRenderingEngine::loadBitmap("pink_checkerboard.bmp");
@@ -367,7 +364,6 @@ void update(SDL_Event sdlEvent)
 
 		if (keys[SDL_SCANCODE_O])
 		{
-			//FurRenderingEngine::setTexture(FUR_OBJ, "rainbow_fur.bmp", true);
 			FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
 			{
 				GLuint colour_texture = FurRenderingEngine::loadBitmap("rainbow_fur.bmp");
@@ -385,6 +381,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
+		//----------- activating and deactivating normal mapping
 		if (keys[SDL_SCANCODE_8])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
@@ -466,7 +463,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
-		// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
+		//----------- layers is how many times the model will be rendered, regardless of what the cutoff layer is
 		if (keys[SDL_SCANCODE_5])
 		{
 			int num_layers = --layers;
