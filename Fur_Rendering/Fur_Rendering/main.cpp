@@ -25,10 +25,6 @@ int cutoffLayer = 20;
 
 int furAmount = 30;
 
-//light related values
-//const unsigned int NUMBER_OF_LIGHTS = 11;
-//rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-//glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
 //// light attenuation
 float attConstant = 0.6f;
 float attLinear = 0.1f;
@@ -76,7 +72,6 @@ void init()
 	{
 		//shaders
 		FurRenderingEngine::addShader(FUR_SHADER, "fur.vert", "fur.frag");
-		FurRenderingEngine::addShader(LIGHT_SHADER, "light.vert", "light.frag");
 		FurRenderingEngine::addShader(PLANE_SHADER, "textured.vert", "textured.frag");
 		FurRenderingEngine::addShader(NORMAL_SHADER, "normalmap.vert", "normalmap.frag");
 
@@ -284,7 +279,7 @@ void update(SDL_Event sdlEvent)
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
 		}
 
-		//----------- changing texture
+		//----------- changing texture of fox
 
 		if (keys[SDL_SCANCODE_P])
 		{
@@ -324,6 +319,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
+		//----------- activating and deactivating normal mapping
 		if (keys[SDL_SCANCODE_8])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
@@ -385,7 +381,7 @@ void update(SDL_Event sdlEvent)
 			);
 		}
 
-		// - layers is how many times the model will be rendered, regardless of what the cutoff layer is
+		//----------- layers is how many times the model will be rendered, regardless of what the cutoff layer is
 		if (keys[SDL_SCANCODE_5])
 		{
 			int num_layers = --layers;

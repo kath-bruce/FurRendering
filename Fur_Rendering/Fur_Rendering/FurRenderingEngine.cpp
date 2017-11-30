@@ -19,7 +19,6 @@ namespace FurRenderingEngine {
 	//at	- point camera initially faces
 	//up	- unit up vector
 	glm::vec3 eye(0.0f, 5.0f, 5.0f);
-	//glm::vec3 at(0.0f, 1.0f, -3.0f);
 	glm::vec3 at(0.0f, 1.0f, -3.0f);
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	glm::vec3 camDiff(0.0f, 5.0f, 5.0f);
@@ -29,9 +28,6 @@ namespace FurRenderingEngine {
 
 	//time - used for swaying effect
 	float t = 0.0f;
-
-	//default value of one to ensure the models are rendered at least once
-	//int num_layers = 1;
 
 	//used during fur texture generation
 	int fur_chance = 30;
@@ -43,15 +39,10 @@ namespace FurRenderingEngine {
 	GLuint cube;
 	GLuint meshIndexCount;
 	
-	//Theta for 
+	//Theta
 	float theta = 0.0f;
 
-	//Lights
-	const unsigned int NUMBER_OF_LIGHTS = 11;
-	rt3d::lightStruct lights[NUMBER_OF_LIGHTS];
-	glm::vec4 lightPositions[NUMBER_OF_LIGHTS];
-
-	//Temporary normal map light
+	//Light
 	rt3d::lightStruct light0 = {
 		{ 0.4f, 0.4f, 0.4f, 1.0f }, // ambient
 		{ 1.0f, 1.0f, 1.0f, 1.0f }, // diffuse
@@ -60,7 +51,7 @@ namespace FurRenderingEngine {
 	};
 	glm::vec4 lightPos(-5.0f, 2.0f, 2.0f, 1.0f); //light position
 
-	//Temporary normal map material
+	//Normal Map Material
 	rt3d::materialStruct material1 = {
 		{ 0.4f, 0.4f, 1.0f, 1.0f }, // ambient
 		{ 0.8f, 0.8f, 1.0f, 1.0f }, // diffuse
@@ -151,7 +142,6 @@ namespace FurRenderingEngine {
 		return *texID;	// return value of texure ID, redundant really
 	}
 
-	//for later
 	GLuint loadBitmap(const char * fname)
 	{
 		GLuint texID;
@@ -216,9 +206,6 @@ namespace FurRenderingEngine {
 
 		// Code taken from http://www.terathon.com/code/tangent.html and modified slightly to use vectors instead of arrays
 		// Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software 3D Graphics Library, 2001. 
-
-		// This is a little messy because my vectors are of type GLfloat:
-		// should have made them glm::vec2 and glm::vec3 - life, would be much easier!
 
 		std::vector<glm::vec3> tan1(verts.size() / 3, glm::vec3(0.0f));
 		std::vector<glm::vec3> tan2(verts.size() / 3, glm::vec3(0.0f));
@@ -368,43 +355,6 @@ namespace FurRenderingEngine {
 		shaders.insert({ shaderName, shaderProgram });
 	}
 
-	/*void setLight(std::string shaderName, rt3d::lightStruct light)
-	{
-	if (shaders.count(shaderName) < 1)
-	{
-	std::cout << "ERROR (setLight): " << shaderName << " has not been initialised!\n";
-	return;
-	}
-
-	GLuint shaderProgram = shaders[shaderName];
-	rt3d::setLight(shaderProgram, light);
-	}*/
-
-	void setLight(std::string shaderName, const rt3d::lightStruct light, const int lightNumber) {
-		// pass in light data to shader
-		std::string asString = std::to_string(lightNumber);
-		GLuint shader = shaders.at(shaderName);
-
-		glUseProgram(shader);
-
-		int uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].ambient").c_str());
-		glUniform4fv(uniformIndex, 1, light.ambient);
-		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].diffuse").c_str());
-		glUniform4fv(uniformIndex, 1, light.diffuse);
-		uniformIndex = glGetUniformLocation(shader, ("lights[" + std::to_string(lightNumber) + "].specular").c_str());
-		glUniform4fv(uniformIndex, 1, light.specular);
-	}
-
-	void setLightPos(std::string shaderName, const GLfloat *lightPos, const int lightNumber) {
-		//pass the light pos to the shader
-		GLuint shader = shaders.at(shaderName);
-
-		glUseProgram(shader);
-
-		int uniformIndex = glGetUniformLocation(shader, ("lightPosition[" + std::to_string(lightNumber) + "]").c_str());
-		glUniform4fv(uniformIndex, 1, lightPos);
-	}
-
 	void setMaterial(std::string shaderName, rt3d::materialStruct mat)
 	{
 		if (shaders.count(shaderName) < 1)
@@ -434,16 +384,6 @@ namespace FurRenderingEngine {
 
 		lambda(shaderProgram);
 	}
-
-	//for later
-	/*glm::vec3 moveForward(glm::vec3 pos, GLfloat angle, GLfloat d) {
-		return glm::vec3(pos.x + d*std::sin(angle*DEG_TO_RADIAN), pos.y, pos.z - d*std::cos(angle*DEG_TO_RADIAN));
-	}*/
-
-	//for later
-	/*glm::vec3 moveRight(glm::vec3 pos, GLfloat angle, GLfloat d) {
-		return glm::vec3(pos.x + d*std::cos(angle*DEG_TO_RADIAN), pos.y, pos.z + d*std::sin(angle*DEG_TO_RADIAN));
-	}*/
 
 	void updateModelRot(std::string modelName, GLfloat rotX, GLfloat rotY, GLfloat rotZ)
 	{
@@ -490,7 +430,6 @@ namespace FurRenderingEngine {
 
 				if (mod.first.substr(0, 11) == "collectable")
 				{
-					//models.erase(mod.first);
 					std::cout << "deleting collectable " << mod.first.substr(11,12) << "\n";
 					collectableId = mod.first;
 				}
@@ -559,8 +498,6 @@ namespace FurRenderingEngine {
 		modelMatrix = glm::translate(modelMatrix, glm::vec3(-2.0f, 1.0f, -3.0f));
 		modelMatrix = glm::rotate(modelMatrix, float(theta*DEG_TO_RADIAN), glm::vec3(1.0f, 1.0f, 1.0f));//transform theta to radians if expressed in degrees
 		mvStack.top() = mvStack.top() * modelMatrix;
-
-		//at = moveForward(eye, 0.0f, 1.0f);
 
 		eye = at + camDiff;
 		mvStack.top() = glm::lookAt(eye, at, up);
