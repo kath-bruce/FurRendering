@@ -633,6 +633,7 @@ namespace FurRenderingEngine {
 
 	GLuint getSkybox()
 	{
+		//gives environment mapping setUniform access to the skybox
 		return skybox[0];
 	}
 

@@ -1,6 +1,6 @@
-// phong-tex.vert
+// refract.vert
 // Vertex shader for use with a Phong or other reflection model fragment shader
-// Calculates and passes on V, L, N vectors for use in fragment shader, phong2.frag
+// Calculates and passes on V, L, N vectors for use in fragment shader, refract.frag
 #version 330
 
 uniform mat4 modelview;
@@ -54,7 +54,4 @@ void main(void) {
 	
 	ex_WorldNorm = normalworldmatrix * in_Normal;
 	ex_WorldView = cameraPos - worldPos;
-
-
-
 }

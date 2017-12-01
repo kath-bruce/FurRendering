@@ -173,6 +173,7 @@ void init()
 		//------------------ setting environment mapped reflection uniforms
 		FurRenderingEngine::setUniform(REFLECT_SHADER, [](GLuint shader) 
 		{
+
 			GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
 
 			int uniformIndex = glGetUniformLocation(shader, "cubeMap");
@@ -188,37 +189,37 @@ void init()
 			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
 			glUniform1f(uniformIndex, attQuadratic);
 
-			glActiveTexture(GL_TEXTURE5);
+			glActiveTexture(GL_TEXTURE5);//binding cubemap skybox
 			glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
-			glActiveTexture(GL_TEXTURE4);
+			glActiveTexture(GL_TEXTURE4);//binding metal texture
 			glBindTexture(GL_TEXTURE_2D, metal_texture);
 		}
 		);
 
-		////------------------ setting environment mapped refraction uniforms
-		//FurRenderingEngine::setUniform(REFRACT_SHADER, [](GLuint shader) 
-		//{
-		//	GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
+		//------------------ setting environment mapped refraction uniforms
+		FurRenderingEngine::setUniform(REFRACT_SHADER, [](GLuint shader) 
+		{
+			GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
 
-		//	int uniformIndex = glGetUniformLocation(shader, "cubeMap");
-		//	glUniform1i(uniformIndex, 6);
+			int uniformIndex = glGetUniformLocation(shader, "cubeMap");
+			glUniform1i(uniformIndex, 6);
 
-		//	uniformIndex = glGetUniformLocation(shader, "texMap");
-		//	glUniform1i(uniformIndex, 7);
+			uniformIndex = glGetUniformLocation(shader, "texMap");
+			glUniform1i(uniformIndex, 7);
 
-		//	uniformIndex = glGetUniformLocation(shader, "attConst");
-		//	glUniform1f(uniformIndex, attConstant);
-		//	uniformIndex = glGetUniformLocation(shader, "attLinear");
-		//	glUniform1f(uniformIndex, attLinear);
-		//	uniformIndex = glGetUniformLocation(shader, "attQuadratic");
-		//	glUniform1f(uniformIndex, attQuadratic);
+			uniformIndex = glGetUniformLocation(shader, "attConst");
+			glUniform1f(uniformIndex, attConstant);
+			uniformIndex = glGetUniformLocation(shader, "attLinear");
+			glUniform1f(uniformIndex, attLinear);
+			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
+			glUniform1f(uniformIndex, attQuadratic);
 
-		//	glActiveTexture(GL_TEXTURE7);
-		//	glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
-		//	glActiveTexture(GL_TEXTURE6);
-		//	glBindTexture(GL_TEXTURE_2D, metal_texture);
-		//}
-		//);
+			glActiveTexture(GL_TEXTURE7);//binding cubemap skybox
+			glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
+			glActiveTexture(GL_TEXTURE6);//binding metal texture
+			glBindTexture(GL_TEXTURE_2D, metal_texture);
+		}
+		);
 
 		//------------------ adding models with initialised shader
 
@@ -228,6 +229,7 @@ void init()
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(50.0f, 0.1f, 50.0f), PLANE_OBJ, PLANE_SHADER, false, "fabric.bmp", 1);
 
+		//------------------ adding reflection and refraction models with initialised shaders
 		FurRenderingEngine::addModel("cube.obj", glm::vec3(2.0f, 1.0f, 0.0f),
 			glm::vec3(0.5f, 0.5f, 0.5f), REFLECT_OBJ, REFLECT_SHADER, false, "metal-texturemap.bmp", 1);
 
@@ -385,14 +387,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_8])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
-
 		}
-
 		if (keys[SDL_SCANCODE_9])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
 		}
-
+		//----------- activating and deactivating reflection shader
 		if (keys[SDL_SCANCODE_K])
 		{
 			FurRenderingEngine::setShader(REFLECT_OBJ, PLANE_SHADER);
@@ -400,8 +400,8 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_L])
 		{
 			FurRenderingEngine::setShader(REFLECT_OBJ, REFLECT_SHADER);
-
 		}
+		//----------- activating and deactivating refraction shader
 		if (keys[SDL_SCANCODE_N])
 		{
 			FurRenderingEngine::setShader(REFRACT_OBJ, PLANE_SHADER);
@@ -409,7 +409,6 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_M])
 		{
 			FurRenderingEngine::setShader(REFRACT_OBJ, REFRACT_SHADER);
-
 		}
 
 

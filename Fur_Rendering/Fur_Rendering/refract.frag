@@ -1,4 +1,4 @@
-// Phong fragment shader phong-tex.frag matched with phong-tex.vert
+// Refract fragment shader refract.frag matched with refract.vert
 #version 330
 
 // Some drivers require the following
@@ -23,12 +23,9 @@ uniform lightStruct light;
 uniform materialStruct material;
 uniform samplerCube cubeMap;
 uniform sampler2D texMap;
-
-
 uniform float attConst;
 uniform float attLinear;
 uniform float attQuadratic;
-
 
 in vec3 ex_N;
 in vec3 ex_V;
@@ -66,5 +63,4 @@ void main(void) {
 
 	vec3 refractTexCoord = refract(-ex_WorldView, normalize(ex_WorldNorm),ratio);
 	out_Color = texture(cubeMap, refractTexCoord);// * texture(texMap, ex_TexCoord) * litColor;
-
 }

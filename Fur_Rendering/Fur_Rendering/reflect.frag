@@ -1,4 +1,4 @@
-// Phong fragment shader phong-tex.frag matched with phong-tex.vert
+// reflect fragment shader reflect.frag matched with reflect.vert
 #version 330
 
 // Some drivers require the following
