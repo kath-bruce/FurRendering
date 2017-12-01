@@ -422,7 +422,7 @@ void update(SDL_Event sdlEvent)
 				cutoffLayer = 1;
 				cutoff_Layer = 1;
 			}
-			std::cout << "decreasing cut off layer: " << cutoffLayer << std::endl;
+			std::cout << "decreasing maximum no of layers: " << cutoffLayer << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
 			{
@@ -439,7 +439,7 @@ void update(SDL_Event sdlEvent)
 				cutoffLayer = 200;
 				cutoff_Layer = 200;
 			}
-			std::cout << "increasing cut off layer: " << cutoffLayer << std::endl;
+			std::cout << "increasing maximum no of layers: " << cutoffLayer << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
 			{

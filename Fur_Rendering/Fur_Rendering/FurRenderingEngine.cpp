@@ -201,6 +201,7 @@ namespace FurRenderingEngine {
 		loadCubeMap(fname, &skybox[0]);
 	}
 
+	//used for normal mapping
 	void calculateTangents(std::vector<GLfloat> &tangents, std::vector<GLfloat> &verts, std::vector<GLfloat> &normals,
 		std::vector<GLfloat> &tex_coords, std::vector<GLuint> &indices) {
 
@@ -273,7 +274,7 @@ namespace FurRenderingEngine {
 	void addModel(const char * modelFileName, glm::vec3 pos, glm::vec3 scale, std::string modelName, 
 		std::string shaderName, bool hasNormalMapping, const char * textureFileName, int num_layers)
 	{
-		//only shaders added to the engine are allowed to be attached to models as shaders should be written for fur rendering
+		//only shaders added to the engine are allowed to be attached to models
 		if (shaders.count(shaderName) < 1)
 		{
 			std::cout << "ERROR (addModel): " << shaderName << " has not been initialised!\n";
@@ -418,6 +419,7 @@ namespace FurRenderingEngine {
 		glm::vec3 newPos(m.getPos().x + diffX, m.getPos().y + diffY, m.getPos().z + diffZ);
 		m.setPos(newPos);
 
+		//collision detection - only relevant when moving
 		bool collision = false;
 		std::string collectableId = "";
 
