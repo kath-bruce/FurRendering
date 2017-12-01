@@ -1,6 +1,6 @@
-// phong-tex.vert
+// reflect.vert
 // Vertex shader for use with a Phong or other reflection model fragment shader
-// Calculates and passes on V, L, N vectors for use in fragment shader, phong2.frag
+// Calculates and passes on V, L, N vectors for use in fragment shader, reflect.frag
 #version 330
 
 uniform mat4 modelview;
