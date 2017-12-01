@@ -70,12 +70,6 @@
     <None Include="cubeMap.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="light.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="light.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="normalmap.vert">
       <Filter>Resource Files</Filter>
     </None>

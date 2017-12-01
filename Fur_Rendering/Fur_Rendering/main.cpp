@@ -101,15 +101,6 @@ void init()
 		}
 		);
 
-		FurRenderingEngine::setUniform(FUR_SHADER, [](GLuint shader)
-		{
-			glm::vec4 temp(1.0, 0.6, 0.0, 0.0);
-
-			int uniformIndex = glGetUniformLocation(shader, "fur_colour");
-			glUniform4fv(uniformIndex, 1, glm::value_ptr(temp));
-		}
-		);
-
 		int gravity_effect = grav_effect;
 
 		FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
@@ -169,56 +160,6 @@ void init()
 
 		}
 		);
-
-		//------------------ setting environment mapped reflection uniforms
-		FurRenderingEngine::setUniform(REFLECT_SHADER, [](GLuint shader) 
-		{
-			GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
-
-			int uniformIndex = glGetUniformLocation(shader, "cubeMap");
-			glUniform1i(uniformIndex, 4);
-
-			uniformIndex = glGetUniformLocation(shader, "texMap");
-			glUniform1i(uniformIndex, 5);
-
-			uniformIndex = glGetUniformLocation(shader, "attConst");
-			glUniform1f(uniformIndex, attConstant);
-			uniformIndex = glGetUniformLocation(shader, "attLinear");
-			glUniform1f(uniformIndex, attLinear);
-			uniformIndex = glGetUniformLocation(shader, "attQuadratic");
-			glUniform1f(uniformIndex, attQuadratic);
-
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
-			glActiveTexture(GL_TEXTURE4);
-			glBindTexture(GL_TEXTURE_2D, metal_texture);
-		}
-		);
-
-		////------------------ setting environment mapped refraction uniforms
-		//FurRenderingEngine::setUniform(REFRACT_SHADER, [](GLuint shader) 
-		//{
-		//	GLuint metal_texture = FurRenderingEngine::loadBitmap("metal-texturemap.bmp");
-
-		//	int uniformIndex = glGetUniformLocation(shader, "cubeMap");
-		//	glUniform1i(uniformIndex, 6);
-
-		//	uniformIndex = glGetUniformLocation(shader, "texMap");
-		//	glUniform1i(uniformIndex, 7);
-
-		//	uniformIndex = glGetUniformLocation(shader, "attConst");
-		//	glUniform1f(uniformIndex, attConstant);
-		//	uniformIndex = glGetUniformLocation(shader, "attLinear");
-		//	glUniform1f(uniformIndex, attLinear);
-		//	uniformIndex = glGetUniformLocation(shader, "attQuadratic");
-		//	glUniform1f(uniformIndex, attQuadratic);
-
-		//	glActiveTexture(GL_TEXTURE7);
-		//	glBindTexture(GL_TEXTURE_CUBE_MAP, FurRenderingEngine::getSkybox());
-		//	glActiveTexture(GL_TEXTURE6);
-		//	glBindTexture(GL_TEXTURE_2D, metal_texture);
-		//}
-		//);
 
 		//------------------ adding models with initialised shader
 
@@ -308,10 +249,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_Z])
 		{
 			FurRenderingEngine::zoomToModel(FUR_OBJ, 0.1f);
+			std::cout << "zoom out on " << FUR_OBJ << std::endl;
 		}
 		if (keys[SDL_SCANCODE_X])
 		{
 			FurRenderingEngine::zoomToModel(FUR_OBJ, -0.1f);
+			std::cout << "zoom in on " << FUR_OBJ << std::endl;
 		}
 
 		//------------ regenerating fur texture 
@@ -319,26 +262,36 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_R])
 		{
 			FurRenderingEngine::regenTexture(FUR_OBJ);
+			std::cout << "regenerate texture on " << FUR_OBJ << std::endl;
 		}
 
 		if (keys[SDL_SCANCODE_F])
 		{
 			furAmount++;
+			if (furAmount > 100)
+				furAmount = 100;
+
 			FurRenderingEngine::setFurChance(furAmount);
 			FurRenderingEngine::regenTexture(FUR_OBJ);
+			std::cout << "increasing fur amount: " << furAmount << std::endl;
 		}
 
 		if (keys[SDL_SCANCODE_G])
 		{
 			furAmount--;
+			if (furAmount < 0)
+				furAmount = 0;
+
 			FurRenderingEngine::setFurChance(furAmount);
 			FurRenderingEngine::regenTexture(FUR_OBJ);
+			std::cout << "decreasing fur amount: " << furAmount << std::endl;
 		}
 
 		//------------ resetting model rotation
 		if (keys[SDL_SCANCODE_Q])
 		{
 			FurRenderingEngine::resetModelRot(FUR_OBJ);
+			std::cout << "reset " << FUR_OBJ << std::endl;
 		}
 
 		//----------- changing texture of fox
@@ -360,6 +313,7 @@ void update(SDL_Event sdlEvent)
 				glActiveTexture(GL_TEXTURE0);
 			}
 			);
+			std::cout << "changed colour texture of " << FUR_OBJ << " to pink_checkerboard.bmp\n";
 		}
 
 		if (keys[SDL_SCANCODE_O])
@@ -379,37 +333,46 @@ void update(SDL_Event sdlEvent)
 				glActiveTexture(GL_TEXTURE0);
 			}
 			);
+
+			std::cout << "changed colour texture of " << FUR_OBJ << " to rainbow_fur.bmp\n";
 		}
 
 		//----------- activating and deactivating normal mapping
 		if (keys[SDL_SCANCODE_8])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, PLANE_SHADER);
-
+			std::cout << "set shader of " << NORMAL_OBJ << " to " << PLANE_SHADER << std::endl;
 		}
-
 		if (keys[SDL_SCANCODE_9])
 		{
 			FurRenderingEngine::setShader(NORMAL_OBJ, NORMAL_SHADER);
+			std::cout << "set shader of " << NORMAL_OBJ << " to " << NORMAL_SHADER << std::endl;
 		}
 
+		//----------- activating and deactivating reflection 
 		if (keys[SDL_SCANCODE_K])
 		{
 			FurRenderingEngine::setShader(REFLECT_OBJ, PLANE_SHADER);
+			std::cout << "set shader of " << REFLECT_OBJ << " to " << PLANE_SHADER << std::endl;
 		}
+
 		if (keys[SDL_SCANCODE_L])
 		{
 			FurRenderingEngine::setShader(REFLECT_OBJ, REFLECT_SHADER);
-
+			std::cout << "set shader of " << REFLECT_OBJ << " to " << REFLECT_SHADER << std::endl;
 		}
+
+		//----------- activating and deactivating refraction 
 		if (keys[SDL_SCANCODE_N])
 		{
 			FurRenderingEngine::setShader(REFRACT_OBJ, PLANE_SHADER);
+			std::cout << "set shader of " << REFRACT_OBJ << " to " << PLANE_SHADER << std::endl;
 		}
+
 		if (keys[SDL_SCANCODE_M])
 		{
 			FurRenderingEngine::setShader(REFRACT_OBJ, REFRACT_SHADER);
-
+			std::cout << "set shader of " << REFRACT_OBJ << " to " << REFRACT_SHADER << std::endl;
 		}
 
 
@@ -418,6 +381,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_1])
 		{
 			int gravity_effect = --grav_effect;
+			if (gravity_effect < 0 || grav_effect < 0)
+			{
+				gravity_effect = 0;
+				grav_effect = 0;
+			}
+			std::cout << "increasing gravity: " << grav_effect << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
 			{
@@ -429,6 +398,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_2])
 		{
 			int gravity_effect = ++grav_effect;
+			if (gravity_effect > 100 || grav_effect > 100)
+			{
+				gravity_effect = 100;
+				grav_effect = 100;
+			}
+			std::cout << "decreasing gravity: " << grav_effect << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&gravity_effect](GLuint shader)
 			{
@@ -443,6 +418,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_3])
 		{
 			int cutoff_Layer = --cutoffLayer;
+			if (cutoffLayer < 1 || cutoff_Layer < 1)
+			{
+				cutoffLayer = 1;
+				cutoff_Layer = 1;
+			}
+			std::cout << "decreasing cut off layer: " << cutoffLayer << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
 			{
@@ -454,6 +435,12 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_4])
 		{
 			int cutoff_Layer = ++cutoffLayer;
+			if (cutoffLayer > 200 || cutoff_Layer > 200)
+			{
+				cutoffLayer = 200;
+				cutoff_Layer = 200;
+			}
+			std::cout << "increasing cut off layer: " << cutoffLayer << std::endl;
 
 			FurRenderingEngine::setUniform(FUR_SHADER, [&cutoff_Layer](GLuint shader)
 			{
@@ -467,12 +454,25 @@ void update(SDL_Event sdlEvent)
 		if (keys[SDL_SCANCODE_5])
 		{
 			int num_layers = --layers;
+			if (num_layers < 1 || layers < 1)
+			{
+				num_layers = 1;
+				layers = 1;
+			}
+
+			std::cout << "decreasing layers: " << layers << std::endl;
 
 			FurRenderingEngine::setNumLayers(FUR_OBJ, num_layers);
 		}
 		if (keys[SDL_SCANCODE_6])
 		{
 			int num_layers = ++layers;
+			if (num_layers > 200 || layers > 200)
+			{
+				num_layers = 200;
+				layers = 200;
+			}
+			std::cout << "increasing layers: " << layers << std::endl;
 
 			FurRenderingEngine::setNumLayers(FUR_OBJ, num_layers);
 		}

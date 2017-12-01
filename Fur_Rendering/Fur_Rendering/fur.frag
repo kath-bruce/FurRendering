@@ -11,7 +11,6 @@ uniform sampler2D textureUnit0;
 uniform sampler2D textureUnit1;
 
 uniform int cutoffLayer; 
-uniform vec4 fur_colour; //to be deprecated????
 
 in vec2 ex_TexCoord;
 in float ex_fragLayer;
